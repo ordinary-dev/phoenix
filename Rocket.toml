@@ -1,0 +1,2 @@
+[global.databases]
+diesel = { url = "db.sqlite3" }

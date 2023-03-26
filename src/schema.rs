@@ -2,14 +2,14 @@
 
 diesel::table! {
     groups (id) {
-        id -> Nullable<Integer>,
+        id -> Integer,
         name -> Text,
     }
 }
 
 diesel::table! {
     links (id) {
-        id -> Nullable<Integer>,
+        id -> Integer,
         name -> Text,
         href -> Text,
         group_id -> Integer,
@@ -18,7 +18,7 @@ diesel::table! {
 
 diesel::table! {
     users (id) {
-        id -> Nullable<Integer>,
+        id -> Integer,
         username -> Text,
         bcrypt -> Text,
     }
