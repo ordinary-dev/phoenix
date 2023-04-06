@@ -41,12 +41,12 @@ func RequireAuth(c *gin.Context, db *gorm.DB) {
 	// Anonymous visitor
 	if err != nil {
 		ShowLoginForm(c)
-        return
+		return
 	}
 
 	err = backend.ValidateToken(db, tokenValue)
 	if err != nil {
 		ShowError(c, err)
-        return
+		return
 	}
 }

@@ -11,16 +11,16 @@ import (
 )
 
 type Admin struct {
-	ID           uint64   `gorm:"primaryKey"`
+	ID           uint64 `gorm:"primaryKey"`
 	Username     string `gorm:"unique;notNull"`
 	Bcrypt       string `gorm:"notNull"`
 	AccessTokens []AccessToken
 }
 
 type AccessToken struct {
-    ID      uint64  `gorm:"primaryKey"`
+	ID         uint64    `gorm:"primaryKey"`
 	Value      string    `gorm:"notNull"`
-	AdminID    uint64      `gorm:"notNull"`
+	AdminID    uint64    `gorm:"notNull"`
 	ValidUntil time.Time `gorm:"NotNull"`
 }
 

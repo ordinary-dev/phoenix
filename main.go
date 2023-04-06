@@ -1,13 +1,13 @@
 package main
 
 import (
-    "errors"
+	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/ordinary-dev/phoenix/backend"
 	"github.com/ordinary-dev/phoenix/views"
 	"log"
 	"net/http"
-    "strconv"
+	"strconv"
 )
 
 func main() {
@@ -20,173 +20,173 @@ func main() {
 	r.LoadHTMLGlob("templates/*")
 	r.Static("/assets", "./assets")
 
-    // Main page
+	// Main page
 	r.GET("/", func(c *gin.Context) {
 		views.RequireAuth(c, db)
-        groups, err := backend.GetGroups(db)
-        if err != nil {
-            views.ShowError(c, err)
-            return
-        }
+		groups, err := backend.GetGroups(db)
+		if err != nil {
+			views.ShowError(c, err)
+			return
+		}
 		c.HTML(http.StatusOK, "index.html.tmpl", gin.H{
-            "groups": groups,
-        })
+			"groups": groups,
+		})
 	})
 
-    // Settings
-    r.GET("/settings", func(c *gin.Context) {
-        views.RequireAuth(c, db)
-        groups, err := backend.GetGroups(db)
-        if err != nil {
-            views.ShowError(c, err)
-            return
-        }
+	// Settings
+	r.GET("/settings", func(c *gin.Context) {
+		views.RequireAuth(c, db)
+		groups, err := backend.GetGroups(db)
+		if err != nil {
+			views.ShowError(c, err)
+			return
+		}
 
-        c.HTML(http.StatusOK, "settings.html.tmpl", gin.H{
-            "groups": groups,
-        })
-    })
+		c.HTML(http.StatusOK, "settings.html.tmpl", gin.H{
+			"groups": groups,
+		})
+	})
 
-    // Create new user
+	// Create new user
 	r.POST("/users", func(c *gin.Context) {
-        // If at least 1 administator exists, require authorization
-        if backend.CountAdmins(db) > 0 {
-            tokenValue, err := c.Cookie("phoenix-token")
+		// If at least 1 administator exists, require authorization
+		if backend.CountAdmins(db) > 0 {
+			tokenValue, err := c.Cookie("phoenix-token")
 
-	        // Anonymous visitor
-	        if err != nil {
-                err = errors.New("At least 1 user exists, you have to sign in first")
-                views.ShowError(c, err)
-                return
-	        }
+			// Anonymous visitor
+			if err != nil {
+				err = errors.New("At least 1 user exists, you have to sign in first")
+				views.ShowError(c, err)
+				return
+			}
 
-	        err = backend.ValidateToken(db, tokenValue)
-	        if err != nil {
-		        views.ShowError(c, err)
-                return
-	        }
-        }
+			err = backend.ValidateToken(db, tokenValue)
+			if err != nil {
+				views.ShowError(c, err)
+				return
+			}
+		}
 
-        // User is authorized or no user exists.
-        // Try to create a user.
+		// User is authorized or no user exists.
+		// Try to create a user.
 		username := c.PostForm("username")
 		password := c.PostForm("password")
 		admin, err := backend.CreateAdmin(db, username, password)
 		if err != nil {
 			views.ShowError(c, err)
-            return
+			return
 		}
 
-        // Generate access token.
+		// Generate access token.
 		token, err := backend.CreateAccessToken(db, admin.ID)
 		if err != nil {
 			views.ShowError(c, err)
-            return
+			return
 		}
 		backend.SetTokenCookie(c, token)
 
-        // Redirect to homepage.
+		// Redirect to homepage.
 		c.Redirect(http.StatusFound, "/")
 	})
-    
-    // Create new group
+
+	// Create new group
 	r.POST("/groups", func(c *gin.Context) {
-        views.RequireAuth(c, db)
+		views.RequireAuth(c, db)
 
 		groupName := c.PostForm("groupName")
 		_, err := backend.CreateGroup(db, groupName)
 		if err != nil {
 			views.ShowError(c, err)
-            return
+			return
 		}
 
-        // Redirect to settings.
+		// Redirect to settings.
 		c.Redirect(http.StatusFound, "/settings")
 	})
-    
-    // Create new link
+
+	// Create new link
 	r.POST("/links", func(c *gin.Context) {
-        views.RequireAuth(c, db)
+		views.RequireAuth(c, db)
 
 		linkName := c.PostForm("linkName")
-        href := c.PostForm("href")
-        groupID, err := strconv.ParseUint(c.PostForm("groupID"), 10, 32)
-        if err != nil {
-            views.ShowError(c, err)
-            return
-        }
+		href := c.PostForm("href")
+		groupID, err := strconv.ParseUint(c.PostForm("groupID"), 10, 32)
+		if err != nil {
+			views.ShowError(c, err)
+			return
+		}
 
 		_, err = backend.CreateLink(db, linkName, href, groupID)
 		if err != nil {
 			views.ShowError(c, err)
-            return
+			return
 		}
 
-        // Redirect to settings.
+		// Redirect to settings.
 		c.Redirect(http.StatusFound, "/settings")
 	})
 
-    // Update link
-    r.POST("/links/:id/put", func(c *gin.Context) {
-        views.RequireAuth(c, db)
+	// Update link
+	r.POST("/links/:id/put", func(c *gin.Context) {
+		views.RequireAuth(c, db)
 
-        id, err := strconv.ParseUint(c.Param("id"), 10, 64)
-        if err != nil {
-            views.ShowError(c, err)
-            return
-        }
+		id, err := strconv.ParseUint(c.Param("id"), 10, 64)
+		if err != nil {
+			views.ShowError(c, err)
+			return
+		}
 		linkName := c.PostForm("linkName")
-        href := c.PostForm("href")
+		href := c.PostForm("href")
 
 		_, err = backend.UpdateLink(db, id, linkName, href)
 		if err != nil {
 			views.ShowError(c, err)
-            return
+			return
 		}
 
-        // Redirect to settings.
+		// Redirect to settings.
 		c.Redirect(http.StatusFound, "/settings")
 	})
 
-    // Delete link
-    r.POST("/links/:id/delete", func(c *gin.Context) {
-        views.RequireAuth(c, db)
+	// Delete link
+	r.POST("/links/:id/delete", func(c *gin.Context) {
+		views.RequireAuth(c, db)
 
-        id, err := strconv.ParseUint(c.Param("id"), 10, 64)
-        if err != nil {
-            views.ShowError(c, err)
-            return
-        }
+		id, err := strconv.ParseUint(c.Param("id"), 10, 64)
+		if err != nil {
+			views.ShowError(c, err)
+			return
+		}
 
 		err = backend.DeleteLink(db, id)
 		if err != nil {
 			views.ShowError(c, err)
-            return
+			return
 		}
 
-        // Redirect to settings.
+		// Redirect to settings.
 		c.Redirect(http.StatusFound, "/settings")
 	})
 
 	r.POST("/signin", func(c *gin.Context) {
-        // Check credentials.
+		// Check credentials.
 		username := c.PostForm("username")
 		password := c.PostForm("password")
 		admin, err := backend.AuthorizeAdmin(db, username, password)
 		if err != nil {
 			views.ShowError(c, err)
-            return
+			return
 		}
 
-        // Generate an access token.
+		// Generate an access token.
 		token, err := backend.CreateAccessToken(db, admin.ID)
 		if err != nil {
 			views.ShowError(c, err)
-            return
+			return
 		}
 		backend.SetTokenCookie(c, token)
 
-        // Redirect to homepage.
+		// Redirect to homepage.
 		c.Redirect(http.StatusFound, "/")
 	})
 
