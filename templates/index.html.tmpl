@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        {{template "head"}}
+        <link rel="stylesheet" href="assets/index.css" />
+    </head>
+    <body>
+        <div class="page">
+            <h1>Phoenix</h1>
+            {{if not .groups}}
+            <p>
+                You don't have any links.
+                Go to <a href="/settings">settings</a> and create one.
+            </p>
+            {{else}}
+            <a href="/settings">Settings</a>
+            {{end}}
+            
+            <div class="row">
+                {{range .groups}}
+                <div class="group">
+                    <h2>{{.Name}}</h2>
+                    {{range .Links}}
+                    <a href="{{.Href}}" target="_blank" rel="noreferrer">{{.Name}}</a>
+                    {{end}}
+                </div>
+                {{end}}
+            </div>
+        </div>
+    </body>
+</html>

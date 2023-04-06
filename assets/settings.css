@@ -1,0 +1,50 @@
+body {
+    padding: 2em 1em;
+}
+
+.row {
+    display: flex;
+    gap: 10px;
+    margin-top: 1em;
+    width: 100%;
+}
+
+.innerForm {
+    display: flex;
+    gap: 10px;
+    min-width: 0;
+    flex-grow: 1;
+}
+
+.row:last-child {
+    padding-bottom: 4em;
+}
+
+h2 {
+    font-size: 20px;
+    margin-top: 3em;
+    margin-bottom: 10px;
+}
+
+input {
+    min-width: 0;
+    flex-grow: 1;
+}
+
+.link-name {
+    width: 130px;
+    flex-grow: 0;
+}
+
+.link-href {
+    flex-grow: 1;
+}
+
+@media screen and (min-width: 600px) {
+    body {
+        padding: 2em 10em;
+    }
+    .row {
+        max-width: 500px;
+    }
+}

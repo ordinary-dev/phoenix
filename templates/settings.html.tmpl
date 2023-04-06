@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        {{template "head"}}
+        <link rel="stylesheet" href="assets/settings.css" />
+    </head>
+    <body>
+        <h1>Settings</h1>
+        <a href="/">Main page</a>
+
+        {{range .groups}}
+        <h2>Group "{{.Name}}"</h2>
+        <form class="row">
+            <input
+                value="{{.Name}}"
+                placeholder="Name"
+                name="groupName"
+                required
+            />
+            <button type="submit">
+                <img src="/assets/svg/floppy-disk-solid.svg" width="16px" height="16px" />
+            </button>
+        </form>
+
+        {{range .Links}}
+        <div class="row">
+        <form method="POST" action="/links/{{.ID}}/put" class="innerForm">
+            <!-- method: put -->
+            <input
+                class="link-name"
+                value="{{.Name}}"
+                name="linkName"
+                placeholder="Name"
+                required
+            />
+            <input
+                class="link-href"
+                value="{{.Href}}"
+                name="href"
+                placeholder="Href"
+                required
+            />
+            <button type="submit">
+                <img src="/assets/svg/floppy-disk-solid.svg" width="16px" height="16px" />
+            </button>
+        </form>
+        <form method="POST" action="/links/{{.ID}}/delete">
+            <button type="submit">
+                <img src="/assets/svg/trash-solid.svg" width="16px" height="16px" />
+            </button>
+        </form>
+        </div>
+        {{end}}
+
+        <form action="/links" method="POST" class="row">
+            <input
+                class="link-name"
+                placeholder="Name"
+                name="linkName"
+                required
+            />
+            <input
+                class="link-href"
+                placeholder="Href"
+                name="href"
+                type="url"
+                required
+            />
+            <input
+                type="hidden"
+                name="groupID"
+                value="{{.ID}}"
+                readonly
+            />
+            <button type="submit">
+                <img src="/assets/svg/plus-solid.svg" width="16px" height="16px" />
+            </button>
+        </form>
+        {{end}}
+
+        <h2>New group</h2>
+        <form method="POST" action="/groups" class="row">
+            <input
+                placeholder="Name"
+                name="groupName"
+                required
+            />
+            <button type="submit">
+                <img src="/assets/svg/plus-solid.svg" width="16px" height="16px" />
+            </button>
+        </form>
+    </body>
+</html>
