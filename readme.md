@@ -20,7 +20,7 @@ services:
     volumes:
       - phoenix:/var/lib/phoenix
     ports:
-      - 80:80
+      - 80:8080
     restart: unless-stopped
 
 volumes:
