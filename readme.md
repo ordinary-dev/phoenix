@@ -6,7 +6,8 @@ Self-hosted start page without the extra stuff.
 
 ## Features
 - No javascript
-- Tiny footprint
+- Relatively low resource consumption (around 7 MiB of RAM)
+- Authorization support
 
 ## Configuration
 Service settings can be set through environment variables.
