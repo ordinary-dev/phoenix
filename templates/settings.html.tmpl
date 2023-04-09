@@ -10,17 +10,24 @@
 
         {{range .groups}}
         <h2>Group "{{.Name}}"</h2>
-        <form class="row">
-            <input
-                value="{{.Name}}"
-                placeholder="Name"
-                name="groupName"
-                required
-            />
-            <button type="submit">
-                <img src="/assets/svg/floppy-disk-solid.svg" width="16px" height="16px" />
-            </button>
-        </form>
+        <div class="row">
+            <form method="POST" action="/groups/{{.ID}}/put" class="innerForm">
+                <input
+                    value="{{.Name}}"
+                    placeholder="Name"
+                    name="groupName"
+                    required
+                />
+                <button type="submit">
+                    <img src="/assets/svg/floppy-disk-solid.svg" width="16px" height="16px" />
+                </button>
+            </form>
+            <form method="POST" action="/groups/{{.ID}}/delete">
+                <button type="submit">
+                    <img src="/assets/svg/trash-solid.svg" width="16px" height="16px" />
+                </button>
+            </form>
+        </div>
 
         {{range .Links}}
         <div class="row">

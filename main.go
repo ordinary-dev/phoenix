@@ -40,6 +40,18 @@ func main() {
 		views.CreateGroup(c, db)
 	})
 
+	// Update group
+	// HTML forms cannot be submitted using PUT or PATCH methods without javascript.
+	r.POST("/groups/:id/put", func(c *gin.Context) {
+		views.UpdateGroup(c, db)
+	})
+
+	// Delete group
+	// HTML forms cannot be submitted using the DELETE method without javascript.
+	r.POST("/groups/:id/delete", func(c *gin.Context) {
+		views.DeleteGroup(c, db)
+	})
+
 	// Create new link
 	r.POST("/links", func(c *gin.Context) {
 		views.CreateLink(c, db)
