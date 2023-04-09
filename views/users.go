@@ -43,7 +43,7 @@ func CreateUser(c *gin.Context, db *gorm.DB) {
 		ShowError(c, err)
 		return
 	}
-	backend.SetTokenCookie(c, token)
+	SetTokenCookie(c, token)
 
 	// Redirect to homepage.
 	c.Redirect(http.StatusFound, "/")
@@ -65,8 +65,13 @@ func AuthorizeUser(c *gin.Context, db *gorm.DB) {
 		ShowError(c, err)
 		return
 	}
-	backend.SetTokenCookie(c, token)
+	SetTokenCookie(c, token)
 
 	// Redirect to homepage.
 	c.Redirect(http.StatusFound, "/")
+}
+
+// Save token for 29 days in cookies
+func SetTokenCookie(c *gin.Context, token backend.AccessToken) {
+	c.SetCookie("phoenix-token", token.Value, 60*60*24*29, "/", "", false, true)
 }

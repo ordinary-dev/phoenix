@@ -4,7 +4,6 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"errors"
-	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 	"time"
@@ -85,11 +84,6 @@ func CreateAccessToken(db *gorm.DB, adminID uint64) (AccessToken, error) {
 	}
 
 	return accessToken, nil
-}
-
-// Save token for 29 days in cookies
-func SetTokenCookie(c *gin.Context, token AccessToken) {
-	c.SetCookie("phoenix-token", token.Value, 60*60*24*29, "/", "", false, true)
 }
 
 func ValidateToken(db *gorm.DB, value string) error {
