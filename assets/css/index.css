@@ -17,7 +17,7 @@ h2 {
     margin-top: 0;
 }
 
-a {
+div > a {
     display: block;
     margin-top: 10px;
 }
