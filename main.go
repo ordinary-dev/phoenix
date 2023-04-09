@@ -22,7 +22,10 @@ func main() {
 
 	// Main page
 	r.GET("/", func(c *gin.Context) {
-		views.RequireAuth(c, db)
+		if err := views.RequireAuth(c, db); err != nil {
+			return
+		}
+
 		groups, err := backend.GetGroups(db)
 		if err != nil {
 			views.ShowError(c, err)
@@ -35,7 +38,10 @@ func main() {
 
 	// Settings
 	r.GET("/settings", func(c *gin.Context) {
-		views.RequireAuth(c, db)
+		if err := views.RequireAuth(c, db); err != nil {
+			return
+		}
+
 		groups, err := backend.GetGroups(db)
 		if err != nil {
 			views.ShowError(c, err)
@@ -91,7 +97,9 @@ func main() {
 
 	// Create new group
 	r.POST("/groups", func(c *gin.Context) {
-		views.RequireAuth(c, db)
+		if err := views.RequireAuth(c, db); err != nil {
+			return
+		}
 
 		groupName := c.PostForm("groupName")
 		_, err := backend.CreateGroup(db, groupName)
@@ -106,7 +114,9 @@ func main() {
 
 	// Create new link
 	r.POST("/links", func(c *gin.Context) {
-		views.RequireAuth(c, db)
+		if err := views.RequireAuth(c, db); err != nil {
+			return
+		}
 
 		linkName := c.PostForm("linkName")
 		href := c.PostForm("href")
@@ -128,7 +138,9 @@ func main() {
 
 	// Update link
 	r.POST("/links/:id/put", func(c *gin.Context) {
-		views.RequireAuth(c, db)
+		if err := views.RequireAuth(c, db); err != nil {
+			return
+		}
 
 		id, err := strconv.ParseUint(c.Param("id"), 10, 64)
 		if err != nil {
@@ -150,7 +162,9 @@ func main() {
 
 	// Delete link
 	r.POST("/links/:id/delete", func(c *gin.Context) {
-		views.RequireAuth(c, db)
+		if err := views.RequireAuth(c, db); err != nil {
+			return
+		}
 
 		id, err := strconv.ParseUint(c.Param("id"), 10, 64)
 		if err != nil {

@@ -1,6 +1,7 @@
 package views
 
 import (
+	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/ordinary-dev/phoenix/backend"
 	"gorm.io/gorm"
@@ -26,9 +27,10 @@ func ShowLoginForm(c *gin.Context) {
 }
 
 // Requires the user to log in before viewing the page.
-// If successful, does nothing.
 // In case of an error, it shows the login page or the error page.
-func RequireAuth(c *gin.Context, db *gorm.DB) {
+// Returns error if the user is not authorized.
+// If `nil` is returned instead of an error, it is safe to display protected content.
+func RequireAuth(c *gin.Context, db *gorm.DB) error {
 	number_of_accounts := backend.CountAdmins(db)
 
 	// First run
@@ -41,12 +43,14 @@ func RequireAuth(c *gin.Context, db *gorm.DB) {
 	// Anonymous visitor
 	if err != nil {
 		ShowLoginForm(c)
-		return
+		return errors.New("User is not authorized")
 	}
 
 	err = backend.ValidateToken(db, tokenValue)
 	if err != nil {
 		ShowError(c, err)
-		return
+		return errors.New("Access token is invalid")
 	}
+
+	return nil
 }
