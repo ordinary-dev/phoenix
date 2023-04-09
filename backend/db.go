@@ -3,10 +3,16 @@ package backend
 import (
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
+    "os"
 )
 
 func GetDatabaseConnection() (*gorm.DB, error) {
-	db, err := gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
+    dbPath := os.Getenv("PHOENIX_DB_PATH")
+    if dbPath == "" {
+        dbPath = "db.sqlite3"
+    }
+
+	db, err := gorm.Open(sqlite.Open(dbPath), &gorm.Config{})
 	if err != nil {
 		return nil, err
 	}
