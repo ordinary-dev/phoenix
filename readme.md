@@ -1,5 +1,7 @@
 # Phoenix
 
+![Screenshot](screenshot.webp)
+
 Self-hosted start page without the extra stuff.
 
 ## Features
