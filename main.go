@@ -69,5 +69,5 @@ func main() {
 		views.DeleteLink(c, db)
 	})
 
-	r.Run()
+    r.Run(":8080")
 }
