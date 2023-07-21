@@ -43,6 +43,7 @@ button {
 input:focus,
 input:hover,
 button:active,
-button:hover {
+button:hover,
+button:focus {
     border-color: #812abd;
 }
