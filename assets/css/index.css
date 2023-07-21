@@ -1,5 +1,5 @@
 .page {
-    padding: 2em 1em;
+    padding: 2em 1.5em;
 }
 
 .row {
@@ -14,7 +14,7 @@
 }
 
 h2 {
-    margin-top: 0;
+    margin-top: 14px;
 }
 
 div > a {
