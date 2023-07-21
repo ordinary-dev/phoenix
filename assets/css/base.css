@@ -19,10 +19,6 @@ body {
     box-sizing: border-box;
 }
 
-a {
-    color: inherit;
-}
-
 input,
 button {
     font-size: inherit;
@@ -46,4 +42,15 @@ button:active,
 button:hover,
 button:focus {
     border-color: #812abd;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-decoration-color: #812abd;
 }
