@@ -13,9 +13,14 @@ func ShowSettings(c *gin.Context, db *gorm.DB) {
 	}
 
 	// Get a list of groups with links
-	groups, err := backend.GetGroups(db)
-	if err != nil {
-		ShowError(c, err)
+	var groups []backend.Group
+	result := db.
+		Model(&backend.Group{}).
+		Preload("Links").
+		Find(&groups)
+
+	if result.Error != nil {
+		ShowError(c, result.Error)
 		return
 	}
 

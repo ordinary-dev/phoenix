@@ -13,16 +13,19 @@ func CreateLink(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
-	linkName := c.PostForm("linkName")
-	href := c.PostForm("href")
 	groupID, err := strconv.ParseUint(c.PostForm("groupID"), 10, 32)
 	if err != nil {
 		ShowError(c, err)
 		return
 	}
 
-	if _, err = backend.CreateLink(db, linkName, href, groupID); err != nil {
-		ShowError(c, err)
+	link := backend.Link{
+		Name:    c.PostForm("linkName"),
+		Href:    c.PostForm("href"),
+		GroupID: groupID,
+	}
+	if result := db.Create(&link); result.Error != nil {
+		ShowError(c, result.Error)
 		return
 	}
 
@@ -40,11 +43,17 @@ func UpdateLink(c *gin.Context, db *gorm.DB) {
 		ShowError(c, err)
 		return
 	}
-	linkName := c.PostForm("linkName")
-	href := c.PostForm("href")
 
-	if _, err = backend.UpdateLink(db, id, linkName, href); err != nil {
+	var link backend.Link
+	if result := db.First(&link, id); result.Error != nil {
 		ShowError(c, err)
+		return
+	}
+
+	link.Name = c.PostForm("linkName")
+	link.Href = c.PostForm("href")
+	if result := db.Save(&link); result.Error != nil {
+		ShowError(c, result.Error)
 		return
 	}
 
@@ -63,8 +72,8 @@ func DeleteLink(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
-	if err = backend.DeleteLink(db, id); err != nil {
-		ShowError(c, err)
+	if result := db.Delete(&backend.Link{}, id); result.Error != nil {
+		ShowError(c, result.Error)
 		return
 	}
 

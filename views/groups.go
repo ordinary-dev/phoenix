@@ -14,9 +14,11 @@ func CreateGroup(c *gin.Context, db *gorm.DB) {
 	}
 
 	// Save new group to the database.
-	groupName := c.PostForm("groupName")
-	if _, err := backend.CreateGroup(db, groupName); err != nil {
-		ShowError(c, err)
+	group := backend.Group{
+		Name: c.PostForm("groupName"),
+	}
+	if result := db.Create(&group); result.Error != nil {
+		ShowError(c, result.Error)
 		return
 	}
 
@@ -34,9 +36,16 @@ func UpdateGroup(c *gin.Context, db *gorm.DB) {
 		ShowError(c, err)
 		return
 	}
-	groupName := c.PostForm("groupName")
-	if _, err := backend.UpdateGroup(db, id, groupName); err != nil {
-		ShowError(c, err)
+
+	var group backend.Group
+	if result := db.First(&group, id); result.Error != nil {
+		ShowError(c, result.Error)
+		return
+	}
+
+	group.Name = c.PostForm("groupName")
+	if result := db.Save(&group); result.Error != nil {
+		ShowError(c, result.Error)
 		return
 	}
 
@@ -55,8 +64,8 @@ func DeleteGroup(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
-	if err = backend.DeleteGroup(db, id); err != nil {
-		ShowError(c, err)
+	if result := db.Delete(&backend.Group{}, id); result.Error != nil {
+		ShowError(c, result.Error)
 		return
 	}
 
