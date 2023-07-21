@@ -18,12 +18,18 @@
                     name="groupName"
                     required
                 />
-                <button type="submit">
+                <button
+                    type="submit"
+                    aria-label="Save the group"
+                >
                     <img src="/assets/svg/floppy-disk-solid.svg" width="16px" height="16px" />
                 </button>
             </form>
             <form method="POST" action="/groups/{{.ID}}/delete">
-                <button type="submit">
+                <button
+                    type="submit"
+                    aria-label="Delete the group"
+                >
                     <img src="/assets/svg/trash-solid.svg" width="16px" height="16px" />
                 </button>
             </form>
@@ -47,12 +53,18 @@
                 placeholder="Href"
                 required
             />
-            <button type="submit">
+            <button
+                type="submit"
+                aria-label="Save the link"
+            >
                 <img src="/assets/svg/floppy-disk-solid.svg" width="16px" height="16px" />
             </button>
         </form>
         <form method="POST" action="/links/{{.ID}}/delete">
-            <button type="submit">
+            <button
+                type="submit"
+                aria-label="Delete the link"
+            >
                 <img src="/assets/svg/trash-solid.svg" width="16px" height="16px" />
             </button>
         </form>
@@ -79,7 +91,10 @@
                 value="{{.ID}}"
                 readonly
             />
-            <button type="submit">
+            <button
+                type="submit"
+                aria-label="Create a new link"
+            >
                 <img src="/assets/svg/plus-solid.svg" width="16px" height="16px" />
             </button>
         </form>
@@ -92,7 +107,10 @@
                 name="groupName"
                 required
             />
-            <button type="submit">
+            <button
+                type="submit"
+                aria-label="Create a new group"
+            >
                 <img src="/assets/svg/plus-solid.svg" width="16px" height="16px" />
             </button>
         </form>
