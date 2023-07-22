@@ -7,7 +7,16 @@ import (
 )
 
 func GetGinEngine(cfg *config.Config, db *gorm.DB) *gin.Engine {
-	engine := gin.Default()
+	if cfg.Production {
+		gin.SetMode(gin.ReleaseMode)
+	}
+
+	engine := gin.New()
+	engine.Use(gin.Recovery())
+	if cfg.EnableGinLogger {
+		engine.Use(gin.Logger())
+	}
+
 	engine.LoadHTMLGlob("templates/*")
 	engine.Static("/assets", "./assets")
 

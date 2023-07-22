@@ -30,6 +30,16 @@ func main() {
 		logrus.Fatalf("%v", err)
 	}
 
+	// Create the first user
+	if cfg.DefaultUsername != "" && cfg.DefaultPassword != "" {
+		if database.CountAdmins(db) < 1 {
+			_, err := database.CreateAdmin(db, cfg.DefaultUsername, cfg.DefaultPassword)
+			if err != nil {
+				logrus.Errorf("%v", err)
+			}
+		}
+	}
+
 	engine := views.GetGinEngine(cfg, db)
 	engine.Run(":8080")
 }

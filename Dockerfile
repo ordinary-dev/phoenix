@@ -22,7 +22,8 @@ COPY assets ./assets
 COPY templates ./templates
 
 RUN mkdir /var/lib/phoenix
-ENV PHOENIX_DB_PATH=/var/lib/phoenix/db.sqlite3
+ENV P_DBPATH="/var/lib/phoenix/db.sqlite3"
+ENV P_PRODUCTION="true"
 
 EXPOSE 8080
 

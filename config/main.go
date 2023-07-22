@@ -7,9 +7,13 @@ import (
 )
 
 type Config struct {
-	SecretKey string `required:"true"`
-	DBPath    string `required:"true"`
-	LogLevel  string `default:"warning"`
+	SecretKey       string `required:"true"`
+	DBPath          string `required:"true"`
+	LogLevel        string `default:"warning"`
+	EnableGinLogger bool   `default:"false"`
+	Production      bool   `default:"true"`
+	DefaultUsername string
+	DefaultPassword string
 }
 
 func GetConfig() (*Config, error) {
