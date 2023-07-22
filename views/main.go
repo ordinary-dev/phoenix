@@ -11,6 +11,8 @@ func GetGinEngine(cfg *config.Config, db *gorm.DB) *gin.Engine {
 	engine.LoadHTMLGlob("templates/*")
 	engine.Static("/assets", "./assets")
 
+	engine.Use(SecurityHeadersMiddleware)
+
 	engine.GET("/signin", func(c *gin.Context) {
 		ShowLoginForm(c)
 	})
