@@ -29,9 +29,17 @@ func GetGinEngine(cfg *config.Config, db *gorm.DB) *gin.Engine {
 		AuthorizeUser(c, db, cfg)
 	})
 
+	engine.GET("/registration", func(c *gin.Context) {
+		ShowRegistrationForm(c, db)
+	})
+	engine.POST("/api/users", func(c *gin.Context) {
+		CreateUser(c, db, cfg)
+	})
+
+	// This group requires authorization before viewing.
 	protected := engine.Group("/")
 	protected.Use(func(c *gin.Context) {
-		AuthMiddleware(c, cfg)
+		AuthMiddleware(c, db, cfg)
 	})
 
 	// Main page
@@ -41,11 +49,6 @@ func GetGinEngine(cfg *config.Config, db *gorm.DB) *gin.Engine {
 
 	protected.GET("/settings", func(c *gin.Context) {
 		ShowSettings(c, db)
-	})
-
-	// Create new user
-	protected.POST("/api/users", func(c *gin.Context) {
-		CreateUser(c, db, cfg)
 	})
 
 	// Create new group

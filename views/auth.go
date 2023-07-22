@@ -12,7 +12,12 @@ import (
 	"time"
 )
 
-func ShowRegistrationForm(c *gin.Context) {
+func ShowRegistrationForm(c *gin.Context, db *gorm.DB) {
+	if database.CountAdmins(db) > 0 {
+		ShowError(c, errors.New("At least 1 user already exists"))
+		return
+	}
+
 	c.HTML(http.StatusOK, "auth.html.tmpl", gin.H{
 		"title":       "Create an account",
 		"description": "To prevent other people from seeing your links, create an account.",
@@ -61,10 +66,14 @@ func RequireAuth(c *gin.Context, cfg *config.Config) (*jwt.RegisteredClaims, err
 	return claims, nil
 }
 
-func AuthMiddleware(c *gin.Context, cfg *config.Config) {
+func AuthMiddleware(c *gin.Context, db *gorm.DB, cfg *config.Config) {
 	claims, err := RequireAuth(c, cfg)
 	if err != nil {
-		c.Redirect(http.StatusFound, "/signin")
+		if database.CountAdmins(db) < 1 {
+			c.Redirect(http.StatusFound, "/registration")
+		} else {
+			c.Redirect(http.StatusFound, "/signin")
+		}
 		c.Abort()
 		return
 	}
@@ -89,6 +98,11 @@ func GetJWTToken(cfg *config.Config) (string, error) {
 }
 
 func CreateUser(c *gin.Context, db *gorm.DB, cfg *config.Config) {
+	if database.CountAdmins(db) > 0 {
+		ShowError(c, errors.New("At least 1 user already exists"))
+		return
+	}
+
 	// Try to create a user.
 	username := c.PostForm("username")
 	password := c.PostForm("password")
