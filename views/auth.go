@@ -17,7 +17,7 @@ func ShowRegistrationForm(c *gin.Context) {
 		"title":       "Create an account",
 		"description": "To prevent other people from seeing your links, create an account.",
 		"button":      "Create",
-		"formAction":  "/users",
+		"formAction":  "/api/users",
 	})
 }
 
@@ -26,7 +26,7 @@ func ShowLoginForm(c *gin.Context) {
 		"title":       "Sign in",
 		"description": "Authorization is required to view this page.",
 		"button":      "Sign in",
-		"formAction":  "/signin",
+		"formAction":  "/api/users/signin",
 	})
 }
 

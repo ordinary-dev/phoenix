@@ -11,7 +11,7 @@
         {{range .groups}}
         <h2>Group "{{.Name}}"</h2>
         <div class="row">
-            <form method="POST" action="/groups/{{.ID}}/put" class="innerForm">
+            <form method="POST" action="/api/groups/{{.ID}}/put" class="innerForm">
                 <input
                     value="{{.Name}}"
                     placeholder="Name"
@@ -25,7 +25,7 @@
                     <img src="/assets/svg/floppy-disk-solid.svg" width="16px" height="16px" />
                 </button>
             </form>
-            <form method="POST" action="/groups/{{.ID}}/delete">
+            <form method="POST" action="/api/groups/{{.ID}}/delete">
                 <button
                     type="submit"
                     aria-label="Delete the group"
@@ -37,7 +37,7 @@
 
         {{range .Links}}
         <div class="row">
-        <form method="POST" action="/links/{{.ID}}/put" class="innerForm">
+        <form method="POST" action="/api/links/{{.ID}}/put" class="innerForm">
             <!-- method: put -->
             <input
                 class="link-name"
@@ -60,7 +60,7 @@
                 <img src="/assets/svg/floppy-disk-solid.svg" width="16px" height="16px" />
             </button>
         </form>
-        <form method="POST" action="/links/{{.ID}}/delete">
+        <form method="POST" action="/api/links/{{.ID}}/delete">
             <button
                 type="submit"
                 aria-label="Delete the link"
@@ -71,7 +71,7 @@
         </div>
         {{end}}
 
-        <form action="/links" method="POST" class="row">
+        <form action="/api/links" method="POST" class="row">
             <input
                 class="link-name"
                 placeholder="Name"
@@ -101,7 +101,7 @@
         {{end}}
 
         <h2>New group</h2>
-        <form method="POST" action="/groups" class="row">
+        <form method="POST" action="/api/groups" class="row">
             <input
                 placeholder="Name"
                 name="groupName"
