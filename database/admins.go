@@ -1,4 +1,4 @@
-package backend
+package database
 
 import (
 	"golang.org/x/crypto/bcrypt"

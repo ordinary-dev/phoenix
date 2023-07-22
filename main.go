@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/ordinary-dev/phoenix/backend"
 	"github.com/ordinary-dev/phoenix/config"
+	"github.com/ordinary-dev/phoenix/database"
 	"github.com/ordinary-dev/phoenix/views"
 	"github.com/sirupsen/logrus"
 )
@@ -25,7 +25,7 @@ func main() {
 	logrus.Infof("Setting log level to %v", logLevel)
 
 	// Connect to the database
-	db, err := backend.GetDatabaseConnection(cfg)
+	db, err := database.GetDatabaseConnection(cfg)
 	if err != nil {
 		logrus.Fatalf("%v", err)
 	}

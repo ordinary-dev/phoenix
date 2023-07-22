@@ -1,4 +1,4 @@
-package backend
+package database
 
 import (
 	"github.com/ordinary-dev/phoenix/config"

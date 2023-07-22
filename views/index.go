@@ -2,16 +2,16 @@ package views
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/ordinary-dev/phoenix/backend"
+	"github.com/ordinary-dev/phoenix/database"
 	"gorm.io/gorm"
 	"net/http"
 )
 
 func ShowMainPage(c *gin.Context, db *gorm.DB) {
 	// Get a list of groups with links
-	var groups []backend.Group
+	var groups []database.Group
 	result := db.
-		Model(&backend.Group{}).
+		Model(&database.Group{}).
 		Preload("Links").
 		Find(&groups)
 

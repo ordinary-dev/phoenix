@@ -2,7 +2,7 @@ package views
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/ordinary-dev/phoenix/backend"
+	"github.com/ordinary-dev/phoenix/database"
 	"gorm.io/gorm"
 	"net/http"
 	"strconv"
@@ -15,7 +15,7 @@ func CreateLink(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
-	link := backend.Link{
+	link := database.Link{
 		Name:    c.PostForm("linkName"),
 		Href:    c.PostForm("href"),
 		GroupID: groupID,
@@ -36,7 +36,7 @@ func UpdateLink(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
-	var link backend.Link
+	var link database.Link
 	if result := db.First(&link, id); result.Error != nil {
 		ShowError(c, err)
 		return
@@ -60,7 +60,7 @@ func DeleteLink(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
-	if result := db.Delete(&backend.Link{}, id); result.Error != nil {
+	if result := db.Delete(&database.Link{}, id); result.Error != nil {
 		ShowError(c, result.Error)
 		return
 	}

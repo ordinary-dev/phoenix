@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/ordinary-dev/phoenix/backend"
 	"github.com/ordinary-dev/phoenix/config"
+	"github.com/ordinary-dev/phoenix/database"
 	"gorm.io/gorm"
 	"net/http"
 	"time"
@@ -92,7 +92,7 @@ func CreateUser(c *gin.Context, db *gorm.DB, cfg *config.Config) {
 	// Try to create a user.
 	username := c.PostForm("username")
 	password := c.PostForm("password")
-	_, err := backend.CreateAdmin(db, username, password)
+	_, err := database.CreateAdmin(db, username, password)
 	if err != nil {
 		ShowError(c, err)
 		return
@@ -114,7 +114,7 @@ func AuthorizeUser(c *gin.Context, db *gorm.DB, cfg *config.Config) {
 	// Check credentials.
 	username := c.PostForm("username")
 	password := c.PostForm("password")
-	_, err := backend.AuthorizeAdmin(db, username, password)
+	_, err := database.AuthorizeAdmin(db, username, password)
 	if err != nil {
 		ShowError(c, err)
 		return

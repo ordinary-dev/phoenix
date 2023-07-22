@@ -1,4 +1,4 @@
-package backend
+package database
 
 type Group struct {
 	ID    uint64 `gorm:"primaryKey"`
