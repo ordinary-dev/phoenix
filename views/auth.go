@@ -132,7 +132,7 @@ func AuthorizeUser(c *gin.Context, db *gorm.DB, cfg *config.Config) {
 	c.Redirect(http.StatusFound, "/")
 }
 
-// Save token for 29 days in cookies
+// Save token for one day in cookies
 func SetTokenCookie(c *gin.Context, token string) {
-	c.SetCookie("phoenix-token", token, 60*60*24*29, "/", "", false, true)
+	c.SetCookie("phoenix-token", token, 60*60*24, "/", "", false, true)
 }
