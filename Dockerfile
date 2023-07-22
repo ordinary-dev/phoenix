@@ -1,4 +1,4 @@
-FROM golang:1.20.3-alpine AS builder
+FROM golang:1.20.6-alpine3.18 AS builder
 
 RUN apk add gcc
 RUN apk add musl-dev
@@ -8,16 +8,14 @@ WORKDIR /app
 COPY go.mod go.sum ./
 RUN go mod download
 
-COPY *.go ./
-COPY backend ./backend
-COPY views ./views
+ADD . .
 
 RUN go build -o main
 
-FROM alpine:3.17.3
+FROM alpine:3.18.2
 
 WORKDIR /app
-COPY --from=builder /app/main ./main
+COPY --from=builder /app/main /usr/local/bin/phoenix
 COPY assets ./assets
 COPY templates ./templates
 
@@ -27,4 +25,4 @@ ENV P_PRODUCTION="true"
 
 EXPOSE 8080
 
-ENTRYPOINT ["/app/main"]
+ENTRYPOINT ["/usr/local/bin/phoenix"]
