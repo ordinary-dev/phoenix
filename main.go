@@ -1,73 +1,45 @@
 package main
 
 import (
-	"github.com/gin-gonic/gin"
-	"github.com/ordinary-dev/phoenix/backend"
+	"github.com/ordinary-dev/phoenix/config"
+	"github.com/ordinary-dev/phoenix/database"
 	"github.com/ordinary-dev/phoenix/views"
-	"log"
+	"github.com/sirupsen/logrus"
 )
 
 func main() {
-	db, err := backend.GetDatabaseConnection()
+	// Configure logger
+	logrus.SetFormatter(&logrus.TextFormatter{
+		FullTimestamp: true,
+	})
+
+	// Read config
+	cfg, err := config.GetConfig()
 	if err != nil {
-		log.Fatal(err)
+		logrus.Fatalf("%v", err)
 	}
 
-	r := gin.Default()
-	r.LoadHTMLGlob("templates/*")
-	r.Static("/assets", "./assets")
+	// Set log level
+	logLevel := cfg.GetLogLevel()
+	logrus.SetLevel(logLevel)
+	logrus.Infof("Setting log level to %v", logLevel)
 
-	// Main page
-	r.GET("/", func(c *gin.Context) {
-		views.ShowMainPage(c, db)
-	})
+	// Connect to the database
+	db, err := database.GetDatabaseConnection(cfg)
+	if err != nil {
+		logrus.Fatalf("%v", err)
+	}
 
-	r.GET("/settings", func(c *gin.Context) {
-		views.ShowSettings(c, db)
-	})
+	// Create the first user
+	if cfg.DefaultUsername != "" && cfg.DefaultPassword != "" {
+		if database.CountAdmins(db) < 1 {
+			_, err := database.CreateAdmin(db, cfg.DefaultUsername, cfg.DefaultPassword)
+			if err != nil {
+				logrus.Errorf("%v", err)
+			}
+		}
+	}
 
-	// Create new user
-	r.POST("/users", func(c *gin.Context) {
-		views.CreateUser(c, db)
-	})
-
-	r.POST("/signin", func(c *gin.Context) {
-		views.AuthorizeUser(c, db)
-	})
-
-	// Create new group
-	r.POST("/groups", func(c *gin.Context) {
-		views.CreateGroup(c, db)
-	})
-
-	// Update group
-	// HTML forms cannot be submitted using PUT or PATCH methods without javascript.
-	r.POST("/groups/:id/put", func(c *gin.Context) {
-		views.UpdateGroup(c, db)
-	})
-
-	// Delete group
-	// HTML forms cannot be submitted using the DELETE method without javascript.
-	r.POST("/groups/:id/delete", func(c *gin.Context) {
-		views.DeleteGroup(c, db)
-	})
-
-	// Create new link
-	r.POST("/links", func(c *gin.Context) {
-		views.CreateLink(c, db)
-	})
-
-	// Update link.
-	// HTML forms cannot be submitted using PUT or PATCH methods without javascript.
-	r.POST("/links/:id/put", func(c *gin.Context) {
-		views.UpdateLink(c, db)
-	})
-
-	// Delete link
-	// HTML forms cannot be submitted using the DELETE method without javascript.
-	r.POST("/links/:id/delete", func(c *gin.Context) {
-		views.DeleteLink(c, db)
-	})
-
-	r.Run(":8080")
+	engine := views.GetGinEngine(cfg, db)
+	engine.Run(":8080")
 }

@@ -1,5 +1,5 @@
 .page {
-    padding: 2em 1em;
+    padding: 2em 1.5em;
 }
 
 .row {
@@ -14,12 +14,14 @@
 }
 
 h2 {
-    margin-top: 0;
+    margin-top: 18px;
+    margin-bottom: 6px;
 }
 
 div > a {
     display: block;
-    margin-top: 10px;
+    padding-top: 6px;
+    padding-bottom: 6px;
 }
 
 @media screen and (min-width: 600px) {

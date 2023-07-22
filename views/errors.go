@@ -13,4 +13,5 @@ func ShowError(c *gin.Context, err error) {
 			"error": err.Error(),
 		},
 	)
+	c.Abort()
 }

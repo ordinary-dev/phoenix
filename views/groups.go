@@ -2,21 +2,19 @@ package views
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/ordinary-dev/phoenix/backend"
+	"github.com/ordinary-dev/phoenix/database"
 	"gorm.io/gorm"
 	"net/http"
 	"strconv"
 )
 
 func CreateGroup(c *gin.Context, db *gorm.DB) {
-	if err := RequireAuth(c, db); err != nil {
-		return
-	}
-
 	// Save new group to the database.
-	groupName := c.PostForm("groupName")
-	if _, err := backend.CreateGroup(db, groupName); err != nil {
-		ShowError(c, err)
+	group := database.Group{
+		Name: c.PostForm("groupName"),
+	}
+	if result := db.Create(&group); result.Error != nil {
+		ShowError(c, result.Error)
 		return
 	}
 
@@ -25,18 +23,21 @@ func CreateGroup(c *gin.Context, db *gorm.DB) {
 }
 
 func UpdateGroup(c *gin.Context, db *gorm.DB) {
-	if err := RequireAuth(c, db); err != nil {
-		return
-	}
-
 	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
 		ShowError(c, err)
 		return
 	}
-	groupName := c.PostForm("groupName")
-	if _, err := backend.UpdateGroup(db, id, groupName); err != nil {
-		ShowError(c, err)
+
+	var group database.Group
+	if result := db.First(&group, id); result.Error != nil {
+		ShowError(c, result.Error)
+		return
+	}
+
+	group.Name = c.PostForm("groupName")
+	if result := db.Save(&group); result.Error != nil {
+		ShowError(c, result.Error)
 		return
 	}
 
@@ -45,18 +46,14 @@ func UpdateGroup(c *gin.Context, db *gorm.DB) {
 }
 
 func DeleteGroup(c *gin.Context, db *gorm.DB) {
-	if err := RequireAuth(c, db); err != nil {
-		return
-	}
-
 	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
 		ShowError(c, err)
 		return
 	}
 
-	if err = backend.DeleteGroup(db, id); err != nil {
-		ShowError(c, err)
+	if result := db.Delete(&database.Group{}, id); result.Error != nil {
+		ShowError(c, result.Error)
 		return
 	}
 
