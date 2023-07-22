@@ -3,14 +3,32 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/ordinary-dev/phoenix/backend"
+	"github.com/ordinary-dev/phoenix/config"
 	"github.com/ordinary-dev/phoenix/views"
-	"log"
+	"github.com/sirupsen/logrus"
 )
 
 func main() {
-	db, err := backend.GetDatabaseConnection()
+	// Configure logger
+	logrus.SetFormatter(&logrus.TextFormatter{
+		FullTimestamp: true,
+	})
+
+	// Read config
+	cfg, err := config.GetConfig()
 	if err != nil {
-		log.Fatal(err)
+		logrus.Fatalf("%v", err)
+	}
+
+	// Set log level
+	logLevel := cfg.GetLogLevel()
+	logrus.SetLevel(logLevel)
+	logrus.Infof("Setting log level to %v", logLevel)
+
+	// Connect to the database
+	db, err := backend.GetDatabaseConnection(cfg)
+	if err != nil {
+		logrus.Fatalf("%v", err)
 	}
 
 	r := gin.Default()
