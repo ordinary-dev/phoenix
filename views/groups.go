@@ -9,10 +9,6 @@ import (
 )
 
 func CreateGroup(c *gin.Context, db *gorm.DB) {
-	if err := RequireAuth(c, db); err != nil {
-		return
-	}
-
 	// Save new group to the database.
 	group := backend.Group{
 		Name: c.PostForm("groupName"),
@@ -27,10 +23,6 @@ func CreateGroup(c *gin.Context, db *gorm.DB) {
 }
 
 func UpdateGroup(c *gin.Context, db *gorm.DB) {
-	if err := RequireAuth(c, db); err != nil {
-		return
-	}
-
 	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
 		ShowError(c, err)
@@ -54,10 +46,6 @@ func UpdateGroup(c *gin.Context, db *gorm.DB) {
 }
 
 func DeleteGroup(c *gin.Context, db *gorm.DB) {
-	if err := RequireAuth(c, db); err != nil {
-		return
-	}
-
 	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
 		ShowError(c, err)

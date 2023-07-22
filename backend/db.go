@@ -13,7 +13,7 @@ func GetDatabaseConnection(cfg *config.Config) (*gorm.DB, error) {
 	}
 
 	// Migrate the schema
-	db.AutoMigrate(&Admin{}, &AccessToken{}, &Group{}, &Link{})
+	db.AutoMigrate(&Admin{}, &Group{}, &Link{})
 
 	return db, nil
 }

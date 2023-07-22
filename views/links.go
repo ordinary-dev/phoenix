@@ -9,10 +9,6 @@ import (
 )
 
 func CreateLink(c *gin.Context, db *gorm.DB) {
-	if err := RequireAuth(c, db); err != nil {
-		return
-	}
-
 	groupID, err := strconv.ParseUint(c.PostForm("groupID"), 10, 32)
 	if err != nil {
 		ShowError(c, err)
@@ -34,10 +30,6 @@ func CreateLink(c *gin.Context, db *gorm.DB) {
 }
 
 func UpdateLink(c *gin.Context, db *gorm.DB) {
-	if err := RequireAuth(c, db); err != nil {
-		return
-	}
-
 	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
 		ShowError(c, err)
@@ -62,10 +54,6 @@ func UpdateLink(c *gin.Context, db *gorm.DB) {
 }
 
 func DeleteLink(c *gin.Context, db *gorm.DB) {
-	if err := RequireAuth(c, db); err != nil {
-		return
-	}
-
 	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
 		ShowError(c, err)

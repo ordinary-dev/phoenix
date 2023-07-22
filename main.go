@@ -35,55 +35,63 @@ func main() {
 	r.LoadHTMLGlob("templates/*")
 	r.Static("/assets", "./assets")
 
+	r.GET("/signin", func(c *gin.Context) {
+		views.ShowLoginForm(c)
+	})
+	r.POST("/signin", func(c *gin.Context) {
+		views.AuthorizeUser(c, db, cfg)
+	})
+
+	protected := r.Group("/")
+	protected.Use(func(c *gin.Context) {
+		views.AuthMiddleware(c, cfg)
+	})
+
 	// Main page
-	r.GET("/", func(c *gin.Context) {
+	protected.GET("/", func(c *gin.Context) {
 		views.ShowMainPage(c, db)
 	})
 
-	r.GET("/settings", func(c *gin.Context) {
+	protected.GET("/settings", func(c *gin.Context) {
 		views.ShowSettings(c, db)
 	})
 
 	// Create new user
-	r.POST("/users", func(c *gin.Context) {
-		views.CreateUser(c, db)
-	})
-
-	r.POST("/signin", func(c *gin.Context) {
-		views.AuthorizeUser(c, db)
+	protected.POST("/users", func(c *gin.Context) {
+		views.CreateUser(c, db, cfg)
 	})
 
 	// Create new group
-	r.POST("/groups", func(c *gin.Context) {
+	protected.POST("/groups", func(c *gin.Context) {
 		views.CreateGroup(c, db)
 	})
 
 	// Update group
 	// HTML forms cannot be submitted using PUT or PATCH methods without javascript.
-	r.POST("/groups/:id/put", func(c *gin.Context) {
+	protected.POST("/groups/:id/put", func(c *gin.Context) {
 		views.UpdateGroup(c, db)
 	})
 
 	// Delete group
 	// HTML forms cannot be submitted using the DELETE method without javascript.
-	r.POST("/groups/:id/delete", func(c *gin.Context) {
+	protected.POST("/groups/:id/delete", func(c *gin.Context) {
 		views.DeleteGroup(c, db)
 	})
 
 	// Create new link
-	r.POST("/links", func(c *gin.Context) {
+	protected.POST("/links", func(c *gin.Context) {
 		views.CreateLink(c, db)
 	})
 
 	// Update link.
 	// HTML forms cannot be submitted using PUT or PATCH methods without javascript.
-	r.POST("/links/:id/put", func(c *gin.Context) {
+	protected.POST("/links/:id/put", func(c *gin.Context) {
 		views.UpdateLink(c, db)
 	})
 
 	// Delete link
 	// HTML forms cannot be submitted using the DELETE method without javascript.
-	r.POST("/links/:id/delete", func(c *gin.Context) {
+	protected.POST("/links/:id/delete", func(c *gin.Context) {
 		views.DeleteLink(c, db)
 	})
 

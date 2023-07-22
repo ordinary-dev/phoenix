@@ -8,10 +8,6 @@ import (
 )
 
 func ShowMainPage(c *gin.Context, db *gorm.DB) {
-	if err := RequireAuth(c, db); err != nil {
-		return
-	}
-
 	// Get a list of groups with links
 	var groups []backend.Group
 	result := db.
