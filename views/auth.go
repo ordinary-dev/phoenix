@@ -78,15 +78,16 @@ func AuthMiddleware(c *gin.Context, db *gorm.DB, cfg *config.Config) {
 				return
 			}
 			SetTokenCookie(c, token)
-		} else {
-			if database.CountAdmins(db) < 1 {
-				c.Redirect(http.StatusFound, "/registration")
-			} else {
-				c.Redirect(http.StatusFound, "/signin")
-			}
-			c.Abort()
 			return
 		}
+
+		if database.CountAdmins(db) < 1 {
+			c.Redirect(http.StatusFound, "/registration")
+		} else {
+			c.Redirect(http.StatusFound, "/signin")
+		}
+		c.Abort()
+		return
 	}
 
 	// Create a new token if the old one is about to expire
