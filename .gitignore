@@ -1,2 +1,7 @@
-*.sqlite3
+*~
 *.db
+*.bak
+*.sqlite3
+**/.DS_Store
+
+/phoenix
