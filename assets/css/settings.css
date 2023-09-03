@@ -7,6 +7,7 @@ body {
     gap: 10px;
     margin-top: 1em;
     width: 100%;
+    max-width: 600px;
 }
 
 .innerForm {
@@ -31,20 +32,12 @@ input {
     flex-grow: 1;
 }
 
-.link-name {
-    width: 130px;
-    flex-grow: 0;
+.small-row {
+    max-width: 140px;
 }
 
-.link-href {
-    flex-grow: 1;
-}
-
-@media screen and (min-width: 600px) {
+@media screen and (min-width: 800px) {
     body {
         padding: 2em 10em;
-    }
-    .row {
-        max-width: 500px;
     }
 }

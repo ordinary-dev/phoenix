@@ -19,9 +19,15 @@ h2 {
 }
 
 div > a {
-    display: block;
+    display: flex;
     padding-top: 6px;
     padding-bottom: 6px;
+    align-items: center;
+    gap: 8px;
+}
+
+div > a > img {
+    filter: invert(100%);
 }
 
 @media screen and (min-width: 600px) {

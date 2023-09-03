@@ -20,6 +20,12 @@ func CreateLink(c *gin.Context, db *gorm.DB) {
 		Href:    c.PostForm("href"),
 		GroupID: groupID,
 	}
+	icon := c.PostForm("icon")
+	if icon == "" {
+		link.Icon = nil
+	} else {
+		link.Icon = &icon
+	}
 	if result := db.Create(&link); result.Error != nil {
 		ShowError(c, result.Error)
 		return
@@ -44,6 +50,12 @@ func UpdateLink(c *gin.Context, db *gorm.DB) {
 
 	link.Name = c.PostForm("linkName")
 	link.Href = c.PostForm("href")
+	icon := c.PostForm("icon")
+	if icon == "" {
+		link.Icon = nil
+	} else {
+		link.Icon = &icon
+	}
 	if result := db.Save(&link); result.Error != nil {
 		ShowError(c, result.Error)
 		return

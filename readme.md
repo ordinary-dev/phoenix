@@ -9,6 +9,7 @@ Self-hosted start page without the extra stuff.
 - Relatively low resource consumption (around 7 MiB of RAM)
 - Authorization support
   - SSO via Trusted Header Auth (_Reverse Proxy_)
+- Font Awesome integration
 
 ## Configuration
 Service settings can be set through environment variables.
@@ -42,3 +43,9 @@ services:
 volumes:
   phoenix:
 ```
+
+## Icons
+
+You can use the free version of [Font Awesome](https://fontawesome.com/search).
+
+The name of the icon must be specified in the following form: `set name/icon name`, for example: `brands/github` or `regular/credit-card`.
