@@ -91,7 +91,7 @@ func AuthMiddleware(c *gin.Context, db *gorm.DB, cfg *config.Config) {
 	}
 
 	// Create a new token if the old one is about to expire
-	if time.Now().Add(12 * time.Hour).After(claims.ExpiresAt.Time) {
+	if time.Now().Add(time.Hour * 24 * 3).After(claims.ExpiresAt.Time) {
 		newToken, err := GetJWTToken(cfg)
 		if err != nil {
 			ShowError(c, err)
@@ -103,7 +103,7 @@ func AuthMiddleware(c *gin.Context, db *gorm.DB, cfg *config.Config) {
 
 func GetJWTToken(cfg *config.Config) (string, error) {
 	claims := jwt.RegisteredClaims{
-		ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
+		ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 24 * 7)),
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString([]byte(cfg.SecretKey))
