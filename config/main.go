@@ -12,6 +12,7 @@ type Config struct {
 	LogLevel        string `default:"warning"`
 	EnableGinLogger bool   `default:"false"`
 	Production      bool   `default:"true"`
+	HeaderAuth      bool   `default:"false"`
 	DefaultUsername string
 	DefaultPassword string
 }

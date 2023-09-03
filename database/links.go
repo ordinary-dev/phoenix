@@ -5,4 +5,5 @@ type Link struct {
 	Name    string `gorm:"notNull"`
 	Href    string `gorm:"notNull"`
 	GroupID uint64 `gorm:"notNull"`
+	Icon    *string
 }

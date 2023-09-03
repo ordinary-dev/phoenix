@@ -3,13 +3,14 @@ package views
 import (
 	"errors"
 	"fmt"
+	"net/http"
+	"time"
+
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/ordinary-dev/phoenix/config"
 	"github.com/ordinary-dev/phoenix/database"
 	"gorm.io/gorm"
-	"net/http"
-	"time"
 )
 
 func ShowRegistrationForm(c *gin.Context, db *gorm.DB) {
@@ -69,6 +70,17 @@ func RequireAuth(c *gin.Context, cfg *config.Config) (*jwt.RegisteredClaims, err
 func AuthMiddleware(c *gin.Context, db *gorm.DB, cfg *config.Config) {
 	claims, err := RequireAuth(c, cfg)
 	if err != nil {
+		if cfg.HeaderAuth && c.Request.Header.Get("Remote-User") != "" {
+			// Generate access token.
+			token, err := GetJWTToken(cfg)
+			if err != nil {
+				ShowError(c, err)
+				return
+			}
+			SetTokenCookie(c, token)
+			return
+		}
+
 		if database.CountAdmins(db) < 1 {
 			c.Redirect(http.StatusFound, "/registration")
 		} else {
@@ -79,7 +91,7 @@ func AuthMiddleware(c *gin.Context, db *gorm.DB, cfg *config.Config) {
 	}
 
 	// Create a new token if the old one is about to expire
-	if time.Now().Add(12 * time.Hour).After(claims.ExpiresAt.Time) {
+	if time.Now().Add(time.Hour * 24 * 3).After(claims.ExpiresAt.Time) {
 		newToken, err := GetJWTToken(cfg)
 		if err != nil {
 			ShowError(c, err)
@@ -91,7 +103,7 @@ func AuthMiddleware(c *gin.Context, db *gorm.DB, cfg *config.Config) {
 
 func GetJWTToken(cfg *config.Config) (string, error) {
 	claims := jwt.RegisteredClaims{
-		ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
+		ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 24 * 7)),
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString([]byte(cfg.SecretKey))

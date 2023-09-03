@@ -1,4 +1,4 @@
-FROM golang:1.20.6-alpine3.18 AS builder
+FROM golang:1.21.0-alpine3.18 AS builder
 
 RUN apk add gcc
 RUN apk add musl-dev
@@ -12,7 +12,7 @@ ADD . .
 
 RUN go build -o main
 
-FROM alpine:3.18.2
+FROM alpine:3.18.3
 
 WORKDIR /app
 COPY --from=builder /app/main /usr/local/bin/phoenix

@@ -8,6 +8,8 @@ Self-hosted start page without the extra stuff.
 - No javascript
 - Relatively low resource consumption (around 7 MiB of RAM)
 - Authorization support
+  - SSO via Trusted Header Auth (_Reverse Proxy_)
+- Font Awesome integration
 
 ## Configuration
 Service settings can be set through environment variables.
@@ -19,6 +21,7 @@ Service settings can be set through environment variables.
 | P_LOGLEVEL          | Log level settings: `debug`, `info`, `warning`, `error`, `fatal` | `warning`                             |
 | P_ENABLEGINLOGGER   | Enable gin's logging middleware. Can create a lot of logs.       | `false`                               |
 | P_PRODUCTION        | Is this instance running in production mode?                     | `true`                                |
+| P_HEADERAUTH        | Enable Trusted Header Auth (SSO)                                 | `false`                               |
 | P_DEFAULTUSERNAME   | Data for the first user.                                         |                                       |
 | P_DEFAULTPASSWORD   | Data for the first user.                                         |                                       |
 
@@ -40,3 +43,9 @@ services:
 volumes:
   phoenix:
 ```
+
+## Icons
+
+You can use the free version of [Font Awesome](https://fontawesome.com/search).
+
+The name of the icon must be specified in the following form: `set name/icon name`, for example: `brands/github` or `regular/credit-card`.

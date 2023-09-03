@@ -21,7 +21,12 @@
                 <div class="group">
                     <h2>{{.Name}}</h2>
                     {{range .Links}}
-                    <a href="{{.Href}}" target="_blank" rel="noreferrer">{{.Name}}</a>
+                        <a href="{{.Href}}" target="_blank" rel="noreferrer">
+                            {{ if .Icon }}
+                                <img src="/assets/icons/{{.Icon}}.svg" width="20" height="20" />
+                            {{ end }}
+                            {{.Name}}
+                        </a>
                     {{end}}
                 </div>
                 {{end}}
