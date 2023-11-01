@@ -24,6 +24,7 @@ Service settings can be set through environment variables.
 | P_HEADERAUTH        | Enable Trusted Header Auth (SSO)                                 | `false`                               |
 | P_DEFAULTUSERNAME   | Data for the first user.                                         |                                       |
 | P_DEFAULTPASSWORD   | Data for the first user.                                         |                                       |
+| P_SECURECOOKIE      | Controls the "secure" option for a token cookie.                 | `true`                                |
 
 ## Docker-compose example
 ```yml

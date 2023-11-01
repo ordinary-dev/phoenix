@@ -15,6 +15,8 @@ type Config struct {
 	HeaderAuth      bool   `default:"false"`
 	DefaultUsername string
 	DefaultPassword string
+	// Controls the "secure" option for a token cookie.
+	SecureCookie bool `default:"true"`
 }
 
 func GetConfig() (*Config, error) {

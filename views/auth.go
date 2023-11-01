@@ -79,7 +79,7 @@ func AuthMiddleware(c *gin.Context, db *gorm.DB, cfg *config.Config) {
 				ShowError(c, err)
 				return
 			}
-			SetTokenCookie(c, token)
+			SetTokenCookie(c, token, cfg)
 			return
 		}
 
@@ -99,7 +99,7 @@ func AuthMiddleware(c *gin.Context, db *gorm.DB, cfg *config.Config) {
 			ShowError(c, err)
 			return
 		}
-		SetTokenCookie(c, newToken)
+		SetTokenCookie(c, newToken, cfg)
 	}
 }
 
@@ -132,7 +132,7 @@ func CreateUser(c *gin.Context, db *gorm.DB, cfg *config.Config) {
 		ShowError(c, err)
 		return
 	}
-	SetTokenCookie(c, token)
+	SetTokenCookie(c, token, cfg)
 
 	// Redirect to homepage.
 	c.Redirect(http.StatusFound, "/")
@@ -154,13 +154,13 @@ func AuthorizeUser(c *gin.Context, db *gorm.DB, cfg *config.Config) {
 		ShowError(c, err)
 		return
 	}
-	SetTokenCookie(c, token)
+	SetTokenCookie(c, token, cfg)
 
 	// Redirect to homepage.
 	c.Redirect(http.StatusFound, "/")
 }
 
-// Save token for one day in cookies
-func SetTokenCookie(c *gin.Context, token string) {
-	c.SetCookie("phoenix-token", token, TOKEN_LIFETIME_IN_SECONDS, "/", "", false, true)
+// Save token in cookies
+func SetTokenCookie(c *gin.Context, token string, cfg *config.Config) {
+	c.SetCookie("phoenix-token", token, TOKEN_LIFETIME_IN_SECONDS, "/", "", cfg.SecureCookie, true)
 }
