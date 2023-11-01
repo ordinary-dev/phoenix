@@ -7,20 +7,22 @@ import (
 	"net/http"
 )
 
-func ShowMainPage(c *gin.Context, db *gorm.DB) {
-	// Get a list of groups with links
-	var groups []database.Group
-	result := db.
-		Model(&database.Group{}).
-		Preload("Links").
-		Find(&groups)
+func ShowMainPage(db *gorm.DB) gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		// Get a list of groups with links
+		var groups []database.Group
+		result := db.
+			Model(&database.Group{}).
+			Preload("Links").
+			Find(&groups)
 
-	if result.Error != nil {
-		ShowError(c, result.Error)
-		return
+		if result.Error != nil {
+			ShowError(ctx, result.Error)
+			return
+		}
+
+		ctx.HTML(http.StatusOK, "index.html.tmpl", gin.H{
+			"groups": groups,
+		})
 	}
-
-	c.HTML(http.StatusOK, "index.html.tmpl", gin.H{
-		"groups": groups,
-	})
 }

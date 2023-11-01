@@ -15,22 +15,24 @@ import (
 
 const TOKEN_LIFETIME_IN_SECONDS = 60 * 60 * 24 * 30
 
-func ShowRegistrationForm(c *gin.Context, db *gorm.DB) {
-	if database.CountAdmins(db) > 0 {
-		ShowError(c, errors.New("At least 1 user already exists"))
-		return
-	}
+func ShowRegistrationForm(db *gorm.DB) gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		if database.CountAdmins(db) > 0 {
+			ShowError(ctx, errors.New("At least 1 user already exists"))
+			return
+		}
 
-	c.HTML(http.StatusOK, "auth.html.tmpl", gin.H{
-		"title":       "Create an account",
-		"description": "To prevent other people from seeing your links, create an account.",
-		"button":      "Create",
-		"formAction":  "/api/users",
-	})
+		ctx.HTML(http.StatusOK, "auth.html.tmpl", gin.H{
+			"title":       "Create an account",
+			"description": "To prevent other people from seeing your links, create an account.",
+			"button":      "Create",
+			"formAction":  "/api/users",
+		})
+	}
 }
 
-func ShowLoginForm(c *gin.Context) {
-	c.HTML(http.StatusOK, "auth.html.tmpl", gin.H{
+func ShowLoginForm(ctx *gin.Context) {
+	ctx.HTML(http.StatusOK, "auth.html.tmpl", gin.H{
 		"title":       "Sign in",
 		"description": "Authorization is required to view this page.",
 		"button":      "Sign in",
@@ -69,37 +71,39 @@ func RequireAuth(c *gin.Context, cfg *config.Config) (*jwt.RegisteredClaims, err
 	return claims, nil
 }
 
-func AuthMiddleware(c *gin.Context, db *gorm.DB, cfg *config.Config) {
-	claims, err := RequireAuth(c, cfg)
-	if err != nil {
-		if cfg.HeaderAuth && c.Request.Header.Get("Remote-User") != "" {
-			// Generate access token.
-			token, err := GetJWTToken(cfg)
-			if err != nil {
-				ShowError(c, err)
+func AuthMiddleware(db *gorm.DB, cfg *config.Config) gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		claims, err := RequireAuth(ctx, cfg)
+		if err != nil {
+			if cfg.HeaderAuth && ctx.Request.Header.Get("Remote-User") != "" {
+				// Generate access token.
+				token, err := GetJWTToken(cfg)
+				if err != nil {
+					ShowError(ctx, err)
+					return
+				}
+				SetTokenCookie(ctx, token, cfg)
 				return
 			}
-			SetTokenCookie(c, token, cfg)
+
+			if database.CountAdmins(db) < 1 {
+				ctx.Redirect(http.StatusFound, "/registration")
+			} else {
+				ctx.Redirect(http.StatusFound, "/signin")
+			}
+			ctx.Abort()
 			return
 		}
 
-		if database.CountAdmins(db) < 1 {
-			c.Redirect(http.StatusFound, "/registration")
-		} else {
-			c.Redirect(http.StatusFound, "/signin")
+		// Create a new token if the old one is about to expire
+		if time.Now().Add(time.Second * (TOKEN_LIFETIME_IN_SECONDS / 2)).After(claims.ExpiresAt.Time) {
+			newToken, err := GetJWTToken(cfg)
+			if err != nil {
+				ShowError(ctx, err)
+				return
+			}
+			SetTokenCookie(ctx, newToken, cfg)
 		}
-		c.Abort()
-		return
-	}
-
-	// Create a new token if the old one is about to expire
-	if time.Now().Add(time.Second * (TOKEN_LIFETIME_IN_SECONDS / 2)).After(claims.ExpiresAt.Time) {
-		newToken, err := GetJWTToken(cfg)
-		if err != nil {
-			ShowError(c, err)
-			return
-		}
-		SetTokenCookie(c, newToken, cfg)
 	}
 }
 
@@ -111,53 +115,57 @@ func GetJWTToken(cfg *config.Config) (string, error) {
 	return token.SignedString([]byte(cfg.SecretKey))
 }
 
-func CreateUser(c *gin.Context, db *gorm.DB, cfg *config.Config) {
-	if database.CountAdmins(db) > 0 {
-		ShowError(c, errors.New("At least 1 user already exists"))
-		return
-	}
+func CreateUser(db *gorm.DB, cfg *config.Config) gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		if database.CountAdmins(db) > 0 {
+			ShowError(ctx, errors.New("At least 1 user already exists"))
+			return
+		}
 
-	// Try to create a user.
-	username := c.PostForm("username")
-	password := c.PostForm("password")
-	_, err := database.CreateAdmin(db, username, password)
-	if err != nil {
-		ShowError(c, err)
-		return
-	}
+		// Try to create a user.
+		username := ctx.PostForm("username")
+		password := ctx.PostForm("password")
+		_, err := database.CreateAdmin(db, username, password)
+		if err != nil {
+			ShowError(ctx, err)
+			return
+		}
 
-	// Generate access token.
-	token, err := GetJWTToken(cfg)
-	if err != nil {
-		ShowError(c, err)
-		return
-	}
-	SetTokenCookie(c, token, cfg)
+		// Generate access token.
+		token, err := GetJWTToken(cfg)
+		if err != nil {
+			ShowError(ctx, err)
+			return
+		}
+		SetTokenCookie(ctx, token, cfg)
 
-	// Redirect to homepage.
-	c.Redirect(http.StatusFound, "/")
+		// Redirect to homepage.
+		ctx.Redirect(http.StatusFound, "/")
+	}
 }
 
-func AuthorizeUser(c *gin.Context, db *gorm.DB, cfg *config.Config) {
-	// Check credentials.
-	username := c.PostForm("username")
-	password := c.PostForm("password")
-	_, err := database.AuthorizeAdmin(db, username, password)
-	if err != nil {
-		ShowError(c, err)
-		return
-	}
+func AuthorizeUser(db *gorm.DB, cfg *config.Config) gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		// Check credentials.
+		username := ctx.PostForm("username")
+		password := ctx.PostForm("password")
+		_, err := database.AuthorizeAdmin(db, username, password)
+		if err != nil {
+			ShowError(ctx, err)
+			return
+		}
 
-	// Generate an access token.
-	token, err := GetJWTToken(cfg)
-	if err != nil {
-		ShowError(c, err)
-		return
-	}
-	SetTokenCookie(c, token, cfg)
+		// Generate an access token.
+		token, err := GetJWTToken(cfg)
+		if err != nil {
+			ShowError(ctx, err)
+			return
+		}
+		SetTokenCookie(ctx, token, cfg)
 
-	// Redirect to homepage.
-	c.Redirect(http.StatusFound, "/")
+		// Redirect to homepage.
+		ctx.Redirect(http.StatusFound, "/")
+	}
 }
 
 // Save token in cookies

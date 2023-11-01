@@ -5,13 +5,13 @@ import (
 	"net/http"
 )
 
-func ShowError(c *gin.Context, err error) {
-	c.HTML(
+func ShowError(ctx *gin.Context, err error) {
+	ctx.HTML(
 		http.StatusBadRequest,
 		"error.html.tmpl",
 		gin.H{
 			"error": err.Error(),
 		},
 	)
-	c.Abort()
+	ctx.Abort()
 }
