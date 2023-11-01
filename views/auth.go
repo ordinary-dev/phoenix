@@ -13,6 +13,8 @@ import (
 	"gorm.io/gorm"
 )
 
+const TOKEN_LIFETIME_IN_SECONDS = 60 * 60 * 24 * 30
+
 func ShowRegistrationForm(c *gin.Context, db *gorm.DB) {
 	if database.CountAdmins(db) > 0 {
 		ShowError(c, errors.New("At least 1 user already exists"))
@@ -91,7 +93,7 @@ func AuthMiddleware(c *gin.Context, db *gorm.DB, cfg *config.Config) {
 	}
 
 	// Create a new token if the old one is about to expire
-	if time.Now().Add(time.Hour * 24 * 3).After(claims.ExpiresAt.Time) {
+	if time.Now().Add(time.Second * (TOKEN_LIFETIME_IN_SECONDS / 2)).After(claims.ExpiresAt.Time) {
 		newToken, err := GetJWTToken(cfg)
 		if err != nil {
 			ShowError(c, err)
@@ -103,7 +105,7 @@ func AuthMiddleware(c *gin.Context, db *gorm.DB, cfg *config.Config) {
 
 func GetJWTToken(cfg *config.Config) (string, error) {
 	claims := jwt.RegisteredClaims{
-		ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 24 * 7)),
+		ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Second * TOKEN_LIFETIME_IN_SECONDS)),
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString([]byte(cfg.SecretKey))
@@ -160,5 +162,5 @@ func AuthorizeUser(c *gin.Context, db *gorm.DB, cfg *config.Config) {
 
 // Save token for one day in cookies
 func SetTokenCookie(c *gin.Context, token string) {
-	c.SetCookie("phoenix-token", token, 60*60*24, "/", "", false, true)
+	c.SetCookie("phoenix-token", token, TOKEN_LIFETIME_IN_SECONDS, "/", "", false, true)
 }
