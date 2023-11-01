@@ -28,6 +28,11 @@ Service settings can be set through environment variables.
 | P_DEFAULTPASSWORD   | Data for the first user.                                         |                                       |
 | P_SECURECOOKIE      | Controls the "secure" option for a token cookie.                 | `true`                                |
 
+Appearance settings:
+| Variable            | Description                                                      | Default                               |
+| ---                 | ---                                                              | ---                                   |
+| P_TITLE             | Website title                                                    | Phoenix                               |
+
 ## Docker-compose example
 ```yml
 services:

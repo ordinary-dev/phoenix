@@ -17,6 +17,8 @@ type Config struct {
 	DefaultPassword string
 	// Controls the "secure" option for a token cookie.
 	SecureCookie bool `default:"true"`
+
+	Title string `default:"Phoenix"`
 }
 
 func GetConfig() (*Config, error) {

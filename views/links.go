@@ -3,17 +3,18 @@ package views
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/ordinary-dev/phoenix/config"
 	"github.com/ordinary-dev/phoenix/database"
 	"gorm.io/gorm"
 	"net/http"
 	"strconv"
 )
 
-func CreateLink(db *gorm.DB) gin.HandlerFunc {
+func CreateLink(cfg *config.Config, db *gorm.DB) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		groupID, err := strconv.ParseUint(ctx.PostForm("groupID"), 10, 32)
 		if err != nil {
-			ShowError(ctx, err)
+			ShowError(ctx, cfg, err)
 			return
 		}
 
@@ -29,7 +30,7 @@ func CreateLink(db *gorm.DB) gin.HandlerFunc {
 			link.Icon = &icon
 		}
 		if result := db.Create(&link); result.Error != nil {
-			ShowError(ctx, result.Error)
+			ShowError(ctx, cfg, result.Error)
 			return
 		}
 
@@ -38,17 +39,17 @@ func CreateLink(db *gorm.DB) gin.HandlerFunc {
 	}
 }
 
-func UpdateLink(db *gorm.DB) gin.HandlerFunc {
+func UpdateLink(cfg *config.Config, db *gorm.DB) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		id, err := strconv.ParseUint(ctx.Param("id"), 10, 64)
 		if err != nil {
-			ShowError(ctx, err)
+			ShowError(ctx, cfg, err)
 			return
 		}
 
 		var link database.Link
 		if result := db.First(&link, id); result.Error != nil {
-			ShowError(ctx, err)
+			ShowError(ctx, cfg, err)
 			return
 		}
 
@@ -61,7 +62,7 @@ func UpdateLink(db *gorm.DB) gin.HandlerFunc {
 			link.Icon = &icon
 		}
 		if result := db.Save(&link); result.Error != nil {
-			ShowError(ctx, result.Error)
+			ShowError(ctx, cfg, result.Error)
 			return
 		}
 
@@ -70,16 +71,16 @@ func UpdateLink(db *gorm.DB) gin.HandlerFunc {
 	}
 }
 
-func DeleteLink(db *gorm.DB) gin.HandlerFunc {
+func DeleteLink(cfg *config.Config, db *gorm.DB) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		id, err := strconv.ParseUint(ctx.Param("id"), 10, 64)
 		if err != nil {
-			ShowError(ctx, err)
+			ShowError(ctx, cfg, err)
 			return
 		}
 
 		if result := db.Delete(&database.Link{}, id); result.Error != nil {
-			ShowError(ctx, result.Error)
+			ShowError(ctx, cfg, result.Error)
 			return
 		}
 

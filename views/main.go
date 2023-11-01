@@ -22,10 +22,10 @@ func GetGinEngine(cfg *config.Config, db *gorm.DB) *gin.Engine {
 
 	engine.Use(SecurityHeadersMiddleware)
 
-	engine.GET("/signin", ShowLoginForm)
+	engine.GET("/signin", ShowLoginForm(cfg))
 	engine.POST("/api/users/signin", AuthorizeUser(db, cfg))
 
-	engine.GET("/registration", ShowRegistrationForm(db))
+	engine.GET("/registration", ShowRegistrationForm(cfg, db))
 	engine.POST("/api/users", CreateUser(db, cfg))
 
 	// This group requires authorization before viewing.
@@ -33,31 +33,31 @@ func GetGinEngine(cfg *config.Config, db *gorm.DB) *gin.Engine {
 	protected.Use(AuthMiddleware(db, cfg))
 
 	// Main page
-	protected.GET("/", ShowMainPage(db))
+	protected.GET("/", ShowMainPage(cfg, db))
 
-	protected.GET("/settings", ShowSettings(db))
+	protected.GET("/settings", ShowSettings(cfg, db))
 
 	// Create new group
-	protected.POST("/api/groups", CreateGroup(db))
+	protected.POST("/api/groups", CreateGroup(cfg, db))
 
 	// Update group
 	// HTML forms cannot be submitted using PUT or PATCH methods without javascript.
-	protected.POST("/api/groups/:id/put", UpdateGroup(db))
+	protected.POST("/api/groups/:id/put", UpdateGroup(cfg, db))
 
 	// Delete group
 	// HTML forms cannot be submitted using the DELETE method without javascript.
-	protected.POST("/api/groups/:id/delete", DeleteGroup(db))
+	protected.POST("/api/groups/:id/delete", DeleteGroup(cfg, db))
 
 	// Create new link
-	protected.POST("/api/links", CreateLink(db))
+	protected.POST("/api/links", CreateLink(cfg, db))
 
 	// Update link.
 	// HTML forms cannot be submitted using PUT or PATCH methods without javascript.
-	protected.POST("/api/links/:id/put", UpdateLink(db))
+	protected.POST("/api/links/:id/put", UpdateLink(cfg, db))
 
 	// Delete link
 	// HTML forms cannot be submitted using the DELETE method without javascript.
-	protected.POST("/api/links/:id/delete", DeleteLink(db))
+	protected.POST("/api/links/:id/delete", DeleteLink(cfg, db))
 
 	return engine
 }
