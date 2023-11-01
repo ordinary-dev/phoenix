@@ -1,6 +1,7 @@
 package views
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/ordinary-dev/phoenix/database"
 	"gorm.io/gorm"
@@ -20,7 +21,7 @@ func CreateGroup(db *gorm.DB) gin.HandlerFunc {
 		}
 
 		// This page is called from the settings, return the user back.
-		ctx.Redirect(http.StatusFound, "/settings")
+		ctx.Redirect(http.StatusFound, fmt.Sprintf("/settings#group-%v", group.ID))
 	}
 }
 
@@ -45,7 +46,7 @@ func UpdateGroup(db *gorm.DB) gin.HandlerFunc {
 		}
 
 		// This page is called from the settings, return the user back.
-		ctx.Redirect(http.StatusFound, "/settings")
+		ctx.Redirect(http.StatusFound, fmt.Sprintf("/settings#group-%v", group.ID))
 	}
 }
 

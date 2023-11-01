@@ -9,7 +9,7 @@
         <a href="/">Main page</a>
 
         {{range .groups}}
-        <h2>Group "{{.Name}}"</h2>
+        <h2 id="group-{{.ID}}">Group "{{.Name}}"</h2>
         <div class="row">
             <form method="POST" action="/api/groups/{{.ID}}/put" class="innerForm">
                 <input
@@ -36,43 +36,43 @@
         </div>
 
         {{range .Links}}
-        <div class="row">
-        <form method="POST" action="/api/links/{{.ID}}/put" class="innerForm">
-            <!-- method: put -->
-            <input
-                class="small-row"
-                value="{{ if .Icon }}{{ .Icon }}{{ end }}"
-                name="icon"
-                placeholder="Icon"
-            />
-            <input
-                class="small-row"
-                value="{{.Name}}"
-                name="linkName"
-                placeholder="Name"
-                required
-            />
-            <input
-                value="{{.Href}}"
-                name="href"
-                placeholder="Href"
-                required
-            />
-            <button
-                type="submit"
-                aria-label="Save the link"
-            >
-                <img src="/assets/svg/floppy-disk-solid.svg" width="16px" height="16px" />
-            </button>
-        </form>
-        <form method="POST" action="/api/links/{{.ID}}/delete">
-            <button
-                type="submit"
-                aria-label="Delete the link"
-            >
-                <img src="/assets/svg/trash-solid.svg" width="16px" height="16px" />
-            </button>
-        </form>
+        <div class="row" id="link-{{.ID}}">
+            <form method="POST" action="/api/links/{{.ID}}/put" class="innerForm">
+                <!-- method: put -->
+                <input
+                    class="small-row"
+                    value="{{ if .Icon }}{{ .Icon }}{{ end }}"
+                    name="icon"
+                    placeholder="Icon"
+                />
+                <input
+                    class="small-row"
+                    value="{{.Name}}"
+                    name="linkName"
+                    placeholder="Name"
+                    required
+                />
+                <input
+                    value="{{.Href}}"
+                    name="href"
+                    placeholder="Href"
+                    required
+                />
+                <button
+                    type="submit"
+                    aria-label="Save the link"
+                >
+                    <img src="/assets/svg/floppy-disk-solid.svg" width="16px" height="16px" />
+                </button>
+            </form>
+            <form method="POST" action="/api/links/{{.ID}}/delete">
+                <button
+                    type="submit"
+                    aria-label="Delete the link"
+                >
+                    <img src="/assets/svg/trash-solid.svg" width="16px" height="16px" />
+                </button>
+            </form>
         </div>
         {{end}}
 

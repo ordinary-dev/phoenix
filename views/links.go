@@ -1,6 +1,7 @@
 package views
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/ordinary-dev/phoenix/database"
 	"gorm.io/gorm"
@@ -33,7 +34,7 @@ func CreateLink(db *gorm.DB) gin.HandlerFunc {
 		}
 
 		// Redirect to settings.
-		ctx.Redirect(http.StatusFound, "/settings")
+		ctx.Redirect(http.StatusFound, fmt.Sprintf("/settings#link-%v", link.ID))
 	}
 }
 
@@ -65,7 +66,7 @@ func UpdateLink(db *gorm.DB) gin.HandlerFunc {
 		}
 
 		// Redirect to settings.
-		ctx.Redirect(http.StatusFound, "/settings")
+		ctx.Redirect(http.StatusFound, fmt.Sprintf("/settings#link-%v", link.ID))
 	}
 }
 
