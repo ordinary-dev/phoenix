@@ -15,6 +15,12 @@ type Config struct {
 	HeaderAuth      bool   `default:"false"`
 	DefaultUsername string
 	DefaultPassword string
+	// Controls the "secure" option for a token cookie.
+	SecureCookie bool `default:"true"`
+
+	Title string `default:"Phoenix"`
+	// Any supported css value, embedded directly into every page.
+	FontFamily string `default:"sans-serif"`
 }
 
 func GetConfig() (*Config, error) {

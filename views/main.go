@@ -22,68 +22,42 @@ func GetGinEngine(cfg *config.Config, db *gorm.DB) *gin.Engine {
 
 	engine.Use(SecurityHeadersMiddleware)
 
-	engine.GET("/signin", func(c *gin.Context) {
-		ShowLoginForm(c)
-	})
-	engine.POST("/api/users/signin", func(c *gin.Context) {
-		AuthorizeUser(c, db, cfg)
-	})
+	engine.GET("/signin", ShowLoginForm(cfg))
+	engine.POST("/api/users/signin", AuthorizeUser(db, cfg))
 
-	engine.GET("/registration", func(c *gin.Context) {
-		ShowRegistrationForm(c, db)
-	})
-	engine.POST("/api/users", func(c *gin.Context) {
-		CreateUser(c, db, cfg)
-	})
+	engine.GET("/registration", ShowRegistrationForm(cfg, db))
+	engine.POST("/api/users", CreateUser(db, cfg))
 
 	// This group requires authorization before viewing.
 	protected := engine.Group("/")
-	protected.Use(func(c *gin.Context) {
-		AuthMiddleware(c, db, cfg)
-	})
+	protected.Use(AuthMiddleware(db, cfg))
 
 	// Main page
-	protected.GET("/", func(c *gin.Context) {
-		ShowMainPage(c, db)
-	})
+	protected.GET("/", ShowMainPage(cfg, db))
 
-	protected.GET("/settings", func(c *gin.Context) {
-		ShowSettings(c, db)
-	})
+	protected.GET("/settings", ShowSettings(cfg, db))
 
 	// Create new group
-	protected.POST("/api/groups", func(c *gin.Context) {
-		CreateGroup(c, db)
-	})
+	protected.POST("/api/groups", CreateGroup(cfg, db))
 
 	// Update group
 	// HTML forms cannot be submitted using PUT or PATCH methods without javascript.
-	protected.POST("/api/groups/:id/put", func(c *gin.Context) {
-		UpdateGroup(c, db)
-	})
+	protected.POST("/api/groups/:id/put", UpdateGroup(cfg, db))
 
 	// Delete group
 	// HTML forms cannot be submitted using the DELETE method without javascript.
-	protected.POST("/api/groups/:id/delete", func(c *gin.Context) {
-		DeleteGroup(c, db)
-	})
+	protected.POST("/api/groups/:id/delete", DeleteGroup(cfg, db))
 
 	// Create new link
-	protected.POST("/api/links", func(c *gin.Context) {
-		CreateLink(c, db)
-	})
+	protected.POST("/api/links", CreateLink(cfg, db))
 
 	// Update link.
 	// HTML forms cannot be submitted using PUT or PATCH methods without javascript.
-	protected.POST("/api/links/:id/put", func(c *gin.Context) {
-		UpdateLink(c, db)
-	})
+	protected.POST("/api/links/:id/put", UpdateLink(cfg, db))
 
 	// Delete link
 	// HTML forms cannot be submitted using the DELETE method without javascript.
-	protected.POST("/api/links/:id/delete", func(c *gin.Context) {
-		DeleteLink(c, db)
-	})
+	protected.POST("/api/links/:id/delete", DeleteLink(cfg, db))
 
 	return engine
 }

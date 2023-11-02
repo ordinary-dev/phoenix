@@ -2,25 +2,28 @@ package views
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/ordinary-dev/phoenix/config"
 	"github.com/ordinary-dev/phoenix/database"
 	"gorm.io/gorm"
 	"net/http"
 )
 
-func ShowSettings(c *gin.Context, db *gorm.DB) {
-	// Get a list of groups with links
-	var groups []database.Group
-	result := db.
-		Model(&database.Group{}).
-		Preload("Links").
-		Find(&groups)
+func ShowSettings(cfg *config.Config, db *gorm.DB) gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		// Get a list of groups with links
+		var groups []database.Group
+		result := db.
+			Model(&database.Group{}).
+			Preload("Links").
+			Find(&groups)
 
-	if result.Error != nil {
-		ShowError(c, result.Error)
-		return
+		if result.Error != nil {
+			ShowError(ctx, cfg, result.Error)
+			return
+		}
+
+		Render(ctx, cfg, http.StatusOK, "settings.html.tmpl", gin.H{
+			"groups": groups,
+		})
 	}
-
-	c.HTML(http.StatusOK, "settings.html.tmpl", gin.H{
-		"groups": groups,
-	})
 }

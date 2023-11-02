@@ -1,5 +1,7 @@
 # Phoenix
 
+[![Go Report Card](https://goreportcard.com/badge/github.com/ordinary-dev/phoenix)](https://goreportcard.com/report/github.com/ordinary-dev/phoenix)
+
 ![Screenshot](screenshot.webp)
 
 Self-hosted start page without the extra stuff.
@@ -24,6 +26,13 @@ Service settings can be set through environment variables.
 | P_HEADERAUTH        | Enable Trusted Header Auth (SSO)                                 | `false`                               |
 | P_DEFAULTUSERNAME   | Data for the first user.                                         |                                       |
 | P_DEFAULTPASSWORD   | Data for the first user.                                         |                                       |
+| P_SECURECOOKIE      | Controls the "secure" option for a token cookie.                 | `true`                                |
+
+Appearance settings:
+| Variable            | Description                                                      | Default                               |
+| ---                 | ---                                                              | ---                                   |
+| P_TITLE             | Website title                                                    | `Phoenix`                             |
+| P_FONTFAMILY        | The font used on the site. Inserted directly into css.           | `sans-serif`                          |
 
 ## Docker-compose example
 ```yml

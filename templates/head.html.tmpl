@@ -1,5 +1,5 @@
 {{define "head"}}
-<title>Phoenix</title>
+<title>{{.WebsiteTitle}}</title>
 <meta charset="utf-8" />
 <meta name="description" content="A minimalistic start page with your collection of links to important sites." />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -8,4 +8,9 @@
 <link rel="icon" type="image/png" href="/assets/favicons/favicon-32.png" sizes="32x32" />
 <link rel="icon" type="image/svg+xml" href="/assets/favicons/favicon.svg" />
 <link rel="apple-touch-icon" href="/assets/favicons/favicon-180.png" />
+<style>
+body {
+    font-family: {{.FontFamily}};
+}
+</style>
 {{end}}
