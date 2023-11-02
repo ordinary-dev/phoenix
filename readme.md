@@ -31,7 +31,8 @@ Service settings can be set through environment variables.
 Appearance settings:
 | Variable            | Description                                                      | Default                               |
 | ---                 | ---                                                              | ---                                   |
-| P_TITLE             | Website title                                                    | Phoenix                               |
+| P_TITLE             | Website title                                                    | `Phoenix`                             |
+| P_FONTFAMILY        | The font used on the site. Inserted directly into css.           | `sans-serif`                          |
 
 ## Docker-compose example
 ```yml

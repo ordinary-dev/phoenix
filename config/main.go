@@ -19,6 +19,8 @@ type Config struct {
 	SecureCookie bool `default:"true"`
 
 	Title string `default:"Phoenix"`
+	// Any supported css value, embedded directly into every page.
+	FontFamily string `default:"sans-serif"`
 }
 
 func GetConfig() (*Config, error) {
