@@ -1,11 +1,12 @@
 package views
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/ordinary-dev/phoenix/config"
 	"github.com/ordinary-dev/phoenix/database"
 	"gorm.io/gorm"
-	"net/http"
 )
 
 func ShowMainPage(cfg *config.Config, db *gorm.DB) gin.HandlerFunc {

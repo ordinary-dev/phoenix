@@ -2,12 +2,13 @@ package views
 
 import (
 	"fmt"
+	"net/http"
+	"strconv"
+
 	"github.com/gin-gonic/gin"
 	"github.com/ordinary-dev/phoenix/config"
 	"github.com/ordinary-dev/phoenix/database"
 	"gorm.io/gorm"
-	"net/http"
-	"strconv"
 )
 
 func CreateGroup(cfg *config.Config, db *gorm.DB) gin.HandlerFunc {
