@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/ordinary-dev/phoenix/database"
 )
@@ -16,11 +17,11 @@ func CreateLink(w http.ResponseWriter, r *http.Request) {
 	}
 
 	link := database.Link{
-		Name:    r.FormValue("linkName"),
-		Href:    r.FormValue("href"),
+		Name:    strings.TrimSpace(r.FormValue("linkName")),
+		Href:    strings.TrimSpace(r.FormValue("href")),
 		GroupID: groupID,
 	}
-	icon := r.FormValue("icon")
+	icon := strings.TrimSpace(r.FormValue("icon"))
 	if icon == "" {
 		link.Icon = nil
 	} else {
@@ -48,9 +49,9 @@ func UpdateLink(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	link.Name = r.FormValue("linkName")
-	link.Href = r.FormValue("href")
-	icon := r.FormValue("icon")
+	link.Name = strings.TrimSpace(r.FormValue("linkName"))
+	link.Href = strings.TrimSpace(r.FormValue("href"))
+	icon := strings.TrimSpace(r.FormValue("icon"))
 	if icon == "" {
 		link.Icon = nil
 	} else {

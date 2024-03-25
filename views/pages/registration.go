@@ -3,6 +3,7 @@ package pages
 import (
 	"errors"
 	"net/http"
+	"strings"
 
 	"github.com/ordinary-dev/phoenix/database"
 	"github.com/ordinary-dev/phoenix/jwttoken"
@@ -41,8 +42,8 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Try to create a user.
-	username := r.FormValue("username")
-	password := r.FormValue("password")
+	username := strings.TrimSpace(r.FormValue("username"))
+	password := strings.TrimSpace(r.FormValue("password"))
 	_, err = database.CreateAdmin(username, password)
 	if err != nil {
 		ShowError(w, http.StatusInternalServerError, err)

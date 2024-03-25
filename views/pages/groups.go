@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/ordinary-dev/phoenix/database"
 )
@@ -11,7 +12,7 @@ import (
 func CreateGroup(w http.ResponseWriter, r *http.Request) {
 	// Save new group to the database.
 	group := database.Group{
-		Name: r.FormValue("groupName"),
+		Name: strings.TrimSpace(r.FormValue("groupName")),
 	}
 
 	if err := database.CreateGroup(&group); err != nil {
@@ -30,7 +31,8 @@ func UpdateGroup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := database.UpdateGroup(int(id), r.FormValue("groupName")); err != nil {
+	newName := strings.TrimSpace(r.FormValue("groupName"))
+	if err := database.UpdateGroup(int(id), newName); err != nil {
 		ShowError(w, http.StatusInternalServerError, err)
 		return
 	}

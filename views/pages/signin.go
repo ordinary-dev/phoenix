@@ -2,6 +2,7 @@ package pages
 
 import (
 	"net/http"
+	"strings"
 
 	log "github.com/sirupsen/logrus"
 
@@ -23,8 +24,8 @@ func ShowSignInForm(w http.ResponseWriter, _ *http.Request) {
 
 func AuthorizeUser(w http.ResponseWriter, r *http.Request) {
 	// Check credentials.
-	username := r.FormValue("username")
-	password := r.FormValue("password")
+	username := strings.TrimSpace(r.FormValue("username"))
+	password := strings.TrimSpace(r.FormValue("password"))
 	_, err := database.GetAdminIfPasswordMatches(username, password)
 	if err != nil {
 		ShowError(w, http.StatusUnauthorized, err)
