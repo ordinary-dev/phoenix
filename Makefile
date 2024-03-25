@@ -1,10 +1,13 @@
-all: fmt vet
+all: fmt test
 
 fmt:
 	gofmt -s -w .
 
-vet:
-	go vet ./...
+test:
+	go test ./...
+
+run:
+	go run .
 
 favicons:
 	convert -background none assets/favicons/favicon.svg -resize 16x16 assets/favicons/favicon-16.png
