@@ -2,9 +2,10 @@ package database
 
 import (
 	"database/sql"
-	_ "github.com/mattn/go-sqlite3"
 	"os"
 	"testing"
+
+	_ "github.com/mattn/go-sqlite3"
 )
 
 const TEST_DB_PATH = "/tmp/phoenix.sqlite3"

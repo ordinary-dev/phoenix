@@ -1,8 +1,9 @@
 package database
 
 import (
-	_ "github.com/mattn/go-sqlite3"
 	"testing"
+
+	_ "github.com/mattn/go-sqlite3"
 )
 
 func TestGroups(t *testing.T) {
