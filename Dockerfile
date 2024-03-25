@@ -1,7 +1,6 @@
-FROM golang:1.21.3-alpine3.18 AS builder
+FROM golang:1.22 AS builder
 
-RUN apk add gcc
-RUN apk add musl-dev
+RUN apt install -y --no-install-recommends gcc
 
 WORKDIR /app
 
@@ -12,7 +11,7 @@ ADD . .
 
 RUN go build -o main
 
-FROM alpine:3.18.4
+FROM debian:bookworm-slim
 
 WORKDIR /app
 COPY --from=builder /app/main /usr/local/bin/phoenix
