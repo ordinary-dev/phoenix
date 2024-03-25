@@ -8,19 +8,13 @@ import (
 )
 
 func ShowMainPage(w http.ResponseWriter, _ *http.Request) {
-	// Get a list of groups with links
-	var groups []database.Group
-	result := database.DB.
-		Model(&database.Group{}).
-		Preload("Links").
-		Find(&groups)
-
-	if result.Error != nil {
-		ShowError(w, http.StatusInternalServerError, result.Error)
+	groups, err := database.GetGroupsWithLinks()
+	if err != nil {
+		ShowError(w, http.StatusInternalServerError, err)
 		return
 	}
 
-	err := Render("index.html.tmpl", w, map[string]any{
+	err = Render("index.html.tmpl", w, map[string]any{
 		"description": "Self-hosted start page.",
 		"groups":      groups,
 	})

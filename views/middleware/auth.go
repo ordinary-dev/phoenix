@@ -57,7 +57,13 @@ func RequireAuth(next http.Handler) http.Handler {
 
 		// Most likely the user is not authorized.
 		if err != nil {
-			if database.CountAdmins() < 1 {
+			count, err := database.CountAdmins()
+			if err != nil {
+				pages.ShowError(w, http.StatusInternalServerError, err)
+				return
+			}
+
+			if count < 1 {
 				http.Redirect(w, r, "/registration", http.StatusFound)
 			} else {
 				http.Redirect(w, r, "/signin", http.StatusFound)

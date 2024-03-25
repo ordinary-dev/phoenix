@@ -7,15 +7,9 @@ import (
 )
 
 func ShowSettings(w http.ResponseWriter, _ *http.Request) {
-	// Get a list of groups with links
-	var groups []database.Group
-	result := database.DB.
-		Model(&database.Group{}).
-		Preload("Links").
-		Find(&groups)
-
-	if result.Error != nil {
-		ShowError(w, http.StatusInternalServerError, result.Error)
+	groups, err := database.GetGroupsWithLinks()
+	if err != nil {
+		ShowError(w, http.StatusInternalServerError, err)
 		return
 	}
 

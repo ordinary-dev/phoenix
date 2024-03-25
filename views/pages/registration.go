@@ -9,7 +9,13 @@ import (
 )
 
 func ShowRegistrationForm(w http.ResponseWriter, _ *http.Request) {
-	if database.CountAdmins() > 0 {
+	userCount, err := database.CountAdmins()
+	if err != nil {
+		ShowError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	if userCount > 0 {
 		ShowError(w, http.StatusBadRequest, errors.New("at least 1 user already exists"))
 		return
 	}
@@ -23,7 +29,13 @@ func ShowRegistrationForm(w http.ResponseWriter, _ *http.Request) {
 }
 
 func CreateUser(w http.ResponseWriter, r *http.Request) {
-	if database.CountAdmins() > 0 {
+	userCount, err := database.CountAdmins()
+	if err != nil {
+		ShowError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	if userCount > 0 {
 		ShowError(w, http.StatusBadRequest, errors.New("at least 1 user already exists"))
 		return
 	}
@@ -31,7 +43,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	// Try to create a user.
 	username := r.FormValue("username")
 	password := r.FormValue("password")
-	_, err := database.CreateAdmin(username, password)
+	_, err = database.CreateAdmin(username, password)
 	if err != nil {
 		ShowError(w, http.StatusInternalServerError, err)
 		return

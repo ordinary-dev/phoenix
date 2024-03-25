@@ -9,7 +9,7 @@ import (
 )
 
 func CreateLink(w http.ResponseWriter, r *http.Request) {
-	groupID, err := strconv.ParseUint(r.FormValue("groupID"), 10, 32)
+	groupID, err := strconv.Atoi(r.FormValue("groupID"))
 	if err != nil {
 		ShowError(w, http.StatusBadRequest, err)
 		return
@@ -26,8 +26,8 @@ func CreateLink(w http.ResponseWriter, r *http.Request) {
 	} else {
 		link.Icon = &icon
 	}
-	if result := database.DB.Create(&link); result.Error != nil {
-		ShowError(w, http.StatusInternalServerError, result.Error)
+	if err := database.CreateLink(&link); err != nil {
+		ShowError(w, http.StatusInternalServerError, err)
 		return
 	}
 
@@ -36,15 +36,15 @@ func CreateLink(w http.ResponseWriter, r *http.Request) {
 }
 
 func UpdateLink(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.ParseUint(r.PathValue("id"), 10, 64)
+	id, err := strconv.Atoi(r.PathValue("id"))
 	if err != nil {
 		ShowError(w, http.StatusBadRequest, err)
 		return
 	}
 
-	var link database.Link
-	if result := database.DB.First(&link, id); result.Error != nil {
-		ShowError(w, http.StatusInternalServerError, result.Error)
+	link, err := database.GetLink(id)
+	if err != nil {
+		ShowError(w, http.StatusInternalServerError, err)
 		return
 	}
 
@@ -56,8 +56,9 @@ func UpdateLink(w http.ResponseWriter, r *http.Request) {
 	} else {
 		link.Icon = &icon
 	}
-	if result := database.DB.Save(&link); result.Error != nil {
-		ShowError(w, http.StatusInternalServerError, result.Error)
+
+	if err := database.UpdateLink(link); err != nil {
+		ShowError(w, http.StatusInternalServerError, err)
 		return
 	}
 
@@ -66,14 +67,14 @@ func UpdateLink(w http.ResponseWriter, r *http.Request) {
 }
 
 func DeleteLink(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.ParseUint(r.PathValue("id"), 10, 64)
+	id, err := strconv.Atoi(r.PathValue("id"))
 	if err != nil {
 		ShowError(w, http.StatusBadRequest, err)
 		return
 	}
 
-	if result := database.DB.Delete(&database.Link{}, id); result.Error != nil {
-		ShowError(w, http.StatusInternalServerError, result.Error)
+	if err := database.DeleteLink(id); err != nil {
+		ShowError(w, http.StatusInternalServerError, err)
 		return
 	}
 

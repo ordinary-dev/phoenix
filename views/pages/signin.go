@@ -25,7 +25,7 @@ func AuthorizeUser(w http.ResponseWriter, r *http.Request) {
 	// Check credentials.
 	username := r.FormValue("username")
 	password := r.FormValue("password")
-	_, err := database.AuthorizeAdmin(username, password)
+	_, err := database.GetAdminIfPasswordMatches(username, password)
 	if err != nil {
 		ShowError(w, http.StatusUnauthorized, err)
 		return
