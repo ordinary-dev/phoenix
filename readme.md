@@ -21,7 +21,6 @@ Service settings can be set through environment variables.
 | P_DBPATH            | Path to the sqlite database.                                     | Docker: `/var/lib/phoenix/db.sqlite3` |
 | P_SECRETKEY         | A long and random secret string used for authorization.          |                                       |
 | P_LOGLEVEL          | Log level settings: `debug`, `info`, `warning`, `error`, `fatal` | `warning`                             |
-| P_ENABLEGINLOGGER   | Enable gin's logging middleware. Can create a lot of logs.       | `false`                               |
 | P_PRODUCTION        | Is this instance running in production mode?                     | `true`                                |
 | P_HEADERAUTH        | Enable Trusted Header Auth (SSO)                                 | `false`                               |
 | P_DEFAULTUSERNAME   | Data for the first user.                                         |                                       |
