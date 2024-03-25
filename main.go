@@ -25,21 +25,23 @@ func main() {
 	logrus.Infof("Setting log level to %v", logLevel)
 
 	// Connect to the database
-	db, err := database.GetDatabaseConnection(cfg)
+	err = database.EstablishDatabaseConnection(cfg)
 	if err != nil {
 		logrus.Fatalf("%v", err)
 	}
 
 	// Create the first user
-	if cfg.DefaultUsername != "" && cfg.DefaultPassword != "" {
-		if database.CountAdmins(db) < 1 {
-			_, err := database.CreateAdmin(db, cfg.DefaultUsername, cfg.DefaultPassword)
-			if err != nil {
-				logrus.Errorf("%v", err)
-			}
+	if cfg.DefaultUsername != "" && cfg.DefaultPassword != "" && database.CountAdmins() < 1 {
+		_, err := database.CreateAdmin(cfg.DefaultUsername, cfg.DefaultPassword)
+		if err != nil {
+			logrus.Errorf("%v", err)
 		}
 	}
 
-	engine := views.GetGinEngine(cfg, db)
-	engine.Run(":8080")
+	server, err := views.GetHttpServer()
+	if err != nil {
+		logrus.Fatal(err)
+	}
+
+	server.ListenAndServe()
 }

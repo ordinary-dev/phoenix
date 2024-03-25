@@ -2,7 +2,6 @@ package database
 
 import (
 	"golang.org/x/crypto/bcrypt"
-	"gorm.io/gorm"
 )
 
 type Admin struct {
@@ -11,14 +10,14 @@ type Admin struct {
 	Bcrypt   string `gorm:"notNull"`
 }
 
-func CountAdmins(db *gorm.DB) int64 {
+func CountAdmins() int64 {
 	var admins []Admin
 	var count int64
-	db.Model(&admins).Count(&count)
+	DB.Model(&admins).Count(&count)
 	return count
 }
 
-func CreateAdmin(db *gorm.DB, username string, password string) (Admin, error) {
+func CreateAdmin(username string, password string) (Admin, error) {
 	hash, err := bcrypt.GenerateFromPassword([]byte(password), 10)
 	if err != nil {
 		return Admin{}, err
@@ -28,7 +27,7 @@ func CreateAdmin(db *gorm.DB, username string, password string) (Admin, error) {
 		Username: username,
 		Bcrypt:   string(hash),
 	}
-	result := db.Create(&admin)
+	result := DB.Create(&admin)
 
 	if result.Error != nil {
 		return Admin{}, result.Error
@@ -37,9 +36,9 @@ func CreateAdmin(db *gorm.DB, username string, password string) (Admin, error) {
 	return admin, nil
 }
 
-func AuthorizeAdmin(db *gorm.DB, username string, password string) (Admin, error) {
+func AuthorizeAdmin(username string, password string) (Admin, error) {
 	var admin Admin
-	result := db.Where("username = ?", username).First(&admin)
+	result := DB.Where("username = ?", username).First(&admin)
 
 	if result.Error != nil {
 		return Admin{}, result.Error

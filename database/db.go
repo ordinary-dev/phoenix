@@ -6,14 +6,17 @@ import (
 	"gorm.io/gorm"
 )
 
-func GetDatabaseConnection(cfg *config.Config) (*gorm.DB, error) {
-	db, err := gorm.Open(sqlite.Open(cfg.DBPath), &gorm.Config{})
+var DB *gorm.DB
+
+func EstablishDatabaseConnection(cfg *config.Config) error {
+	var err error
+	DB, err = gorm.Open(sqlite.Open(cfg.DBPath), &gorm.Config{})
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	// Migrate the schema
-	db.AutoMigrate(&Admin{}, &Group{}, &Link{})
+	DB.AutoMigrate(&Admin{}, &Group{}, &Link{})
 
-	return db, nil
+	return nil
 }
