@@ -1,0 +1,37 @@
+.group {
+    width: 100%;
+    max-width: max-content;
+}
+
+.links {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.links > a {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 130px;
+    height: 130px;
+    padding-top: 6px;
+    padding-bottom: 6px;
+    align-items: center;
+    gap: 8px;
+    border: 2px solid #444;
+    border-radius: 5px;
+    text-align: center;
+}
+
+.links > a:hover {
+    border-color: #812abd;
+    text-decoration: none;
+}
+
+.links img {
+    flex-grow: 1;
+    width: 30px;
+    height: 30px;
+}

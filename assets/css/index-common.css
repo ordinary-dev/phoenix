@@ -1,0 +1,44 @@
+.page {
+    padding: 2em 1.5em;
+}
+
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1em;
+    margin-top: 3em;
+}
+
+@media screen and (min-width: 600px) {
+    .page {
+        padding: 2em 10em
+    }
+    .row {
+        gap: 4em;
+    }
+}
+
+.controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1em;
+}
+
+.controls a {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.controls a img {
+    filter: invert(100%);
+}
+
+h2 {
+    margin-top: 18px;
+    margin-bottom: 6px;
+}
+
+img {
+    filter: invert(100%);
+}
