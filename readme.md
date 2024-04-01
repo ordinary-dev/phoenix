@@ -11,6 +11,8 @@ Self-hosted start page without the extra stuff.
 - Authorization support
   - SSO via Trusted Header Auth (_Reverse Proxy_)
 - Font Awesome integration
+- Multiple styles
+- Export and import
 
 ## Configuration
 Service settings can be set through environment variables.
