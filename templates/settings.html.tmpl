@@ -6,7 +6,18 @@
     </head>
     <body>
         <h1>Settings</h1>
-        <a href="/">Main page</a>
+
+        <div class="actions">
+            <a href="/">
+                <img src="/assets/icons/solid/house.svg" width="20" height="20" /> Main page
+            </a>
+            <a href="/export">
+                <img src="/assets/icons/solid/file-export.svg" width="20" height="20" /> Export links
+            </a>
+            <a href="/import">
+                <img src="/assets/icons/solid/file-import.svg" width="20" height="20" /> Import links
+            </a>
+        </div>
 
         {{range .groups}}
         <h2 id="group-{{.ID}}">Group "{{.Name}}"</h2>

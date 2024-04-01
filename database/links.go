@@ -1,11 +1,11 @@
 package database
 
 type Link struct {
-	ID      int
-	Name    string
-	Href    string
-	GroupID int
-	Icon    *string
+	ID      int     `json:"id"`
+	Name    string  `json:"name"`
+	Href    string  `json:"href"`
+	GroupID int     `json:"-"`
+	Icon    *string `json:"icon,omitempty"`
 }
 
 func GetLinksFromGroup(groupID int) ([]Link, error) {

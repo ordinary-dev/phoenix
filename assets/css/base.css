@@ -19,7 +19,8 @@ body {
 }
 
 input,
-button {
+button,
+textarea {
     font-size: inherit;
     font-family: inherit;
     padding: 8px 10px;
@@ -35,11 +36,17 @@ button {
     cursor: pointer;
 }
 
+textarea {
+    resize: vertical;
+}
+
 input:focus,
 input:hover,
 button:active,
 button:hover,
-button:focus {
+button:focus,
+textarea:focus,
+textarea:hover {
     border-color: #812abd;
 }
 

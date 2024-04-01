@@ -1,9 +1,9 @@
 package database
 
 type Group struct {
-	ID    int
-	Name  string
-	Links []Link
+	ID    int    `json:"id"`
+	Name  string `json:"name"`
+	Links []Link `json:"links"`
 }
 
 func GetGroupsWithLinks() ([]Group, error) {

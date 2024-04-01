@@ -2,6 +2,21 @@ body {
     padding: 2em 1em;
 }
 
+.actions {
+    display: flex;
+    gap: 2em;
+}
+
+.actions a {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.actions a img {
+    filter: invert(100%);
+}
+
 .row {
     display: flex;
     gap: 10px;

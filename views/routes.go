@@ -53,6 +53,11 @@ func GetHttpServer() (*http.Server, error) {
 	// Delete link.
 	protectedMux.HandleFunc("POST /links/{id}/delete", pages.DeleteLink)
 
+	// Import-export
+	protectedMux.HandleFunc("GET /export", pages.Export)
+	protectedMux.HandleFunc("GET /import", pages.ImportPage)
+	protectedMux.HandleFunc("POST /import", pages.Import)
+
 	return &http.Server{
 		Addr: ":8080",
 		Handler: middleware.LoggingMiddleware(
