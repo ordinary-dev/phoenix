@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/ordinary-dev/phoenix/database"
-	log "github.com/sirupsen/logrus"
 )
 
 func ShowMainPage(w http.ResponseWriter, r *http.Request) {
@@ -38,12 +37,9 @@ func ShowMainPage(w http.ResponseWriter, r *http.Request) {
 		style = "list"
 	}
 
-	err = Render("index.html.tmpl", w, map[string]any{
+	Render("index.html.tmpl", w, map[string]any{
 		"description": "Self-hosted start page.",
 		"groups":      groups,
 		"style":       style,
 	})
-	if err != nil {
-		log.Error(err)
-	}
 }

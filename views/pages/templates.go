@@ -59,12 +59,15 @@ func LoadTemplates() error {
 	return nil
 }
 
-func Render(template string, wr io.Writer, data map[string]any) error {
+func Render(template string, wr io.Writer, data map[string]any) {
 	data["fontFamily"] = config.Cfg.FontFamily
 
 	if _, ok := data["title"]; !ok {
 		data["title"] = config.Cfg.Title
 	}
 
-	return templates[template].Execute(wr, data)
+	err := templates[template].Execute(wr, data)
+	if err != nil {
+		log.WithField("template", template).Error(err)
+	}
 }
