@@ -6,18 +6,29 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+var Cfg Config
+
 type Config struct {
-	SecretKey       string `required:"true"`
-	DBPath          string `required:"true"`
-	LogLevel        string `default:"warning"`
-	EnableGinLogger bool   `default:"false"`
-	Production      bool   `default:"true"`
-	HeaderAuth      bool   `default:"false"`
+	// A long and random secret string used for authorization.
+	SecretKey string `required:"true"`
+	// Path to the sqlite database.
+	DBPath string `required:"true"`
+
+	LogLevel string `default:"warning"`
+
+	// Allows you to skip authorization if the "Remote-User" header is specified.
+	// Don't use it if you don't know why you need it.
+	HeaderAuth bool `default:"false"`
+
+	// Data for the first user.
+	// Optional, the site also allows you to create the first user.
 	DefaultUsername string
 	DefaultPassword string
+
 	// Controls the "secure" option for a token cookie.
 	SecureCookie bool `default:"true"`
 
+	// Site title.
 	Title string `default:"Phoenix"`
 	// Any supported css value, embedded directly into every page.
 	FontFamily string `default:"sans-serif"`
@@ -29,13 +40,12 @@ func GetConfig() (*Config, error) {
 		logrus.Infof("Config: %v", err)
 	}
 
-	var cfg Config
-	err = envconfig.Process("p", &cfg)
+	err = envconfig.Process("p", &Cfg)
 	if err != nil {
 		return nil, err
 	}
 
-	return &cfg, nil
+	return &Cfg, nil
 }
 
 func (cfg *Config) GetLogLevel() logrus.Level {
@@ -44,7 +54,7 @@ func (cfg *Config) GetLogLevel() logrus.Level {
 		return logrus.DebugLevel
 	case "info":
 		return logrus.InfoLevel
-	case "warning":
+	case "warning", "warn":
 		return logrus.WarnLevel
 	case "error":
 		return logrus.ErrorLevel

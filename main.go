@@ -4,42 +4,56 @@ import (
 	"github.com/ordinary-dev/phoenix/config"
 	"github.com/ordinary-dev/phoenix/database"
 	"github.com/ordinary-dev/phoenix/views"
-	"github.com/sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 )
 
 func main() {
 	// Configure logger
-	logrus.SetFormatter(&logrus.TextFormatter{
+	log.SetFormatter(&log.TextFormatter{
 		FullTimestamp: true,
 	})
 
 	// Read config
 	cfg, err := config.GetConfig()
 	if err != nil {
-		logrus.Fatalf("%v", err)
+		log.Fatal(err)
 	}
 
 	// Set log level
 	logLevel := cfg.GetLogLevel()
-	logrus.SetLevel(logLevel)
-	logrus.Infof("Setting log level to %v", logLevel)
+	log.SetLevel(logLevel)
+	log.Infof("Setting log level to %v", logLevel)
 
 	// Connect to the database
-	db, err := database.GetDatabaseConnection(cfg)
+	err = database.EstablishDatabaseConnection(cfg)
 	if err != nil {
-		logrus.Fatalf("%v", err)
+		log.Fatal(err)
+	}
+
+	// Apply migrations.
+	if err := database.ApplyMigrations(); err != nil {
+		log.Fatal(err)
 	}
 
 	// Create the first user
 	if cfg.DefaultUsername != "" && cfg.DefaultPassword != "" {
-		if database.CountAdmins(db) < 1 {
-			_, err := database.CreateAdmin(db, cfg.DefaultUsername, cfg.DefaultPassword)
+		adminCount, err := database.CountAdmins()
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		if adminCount < 1 {
+			_, err := database.CreateAdmin(cfg.DefaultUsername, cfg.DefaultPassword)
 			if err != nil {
-				logrus.Errorf("%v", err)
+				log.Fatal(err)
 			}
 		}
 	}
 
-	engine := views.GetGinEngine(cfg, db)
-	engine.Run(":8080")
+	server, err := views.GetHttpServer()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	server.ListenAndServe()
 }

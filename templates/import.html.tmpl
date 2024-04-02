@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        {{template "head" .}}
+        <link rel="stylesheet" href="assets/css/import.css" />
+    </head>
+    <body>
+        <h1>Import</h1>
+
+        <a href="/settings">Settings</a>
+
+        <p>
+            Importing does not erase existing links, but may create duplicates.
+        </p>
+
+        <form action="/import" method="POST">
+            <label for="exportFile">JSON data</label>
+            <textarea
+                id="exportFile"
+                name="exportFile"
+                placeholder="{ groups: [] }"
+                required
+            ></textarea>
+            <button type="submit">Submit</button>
+        </form>
+    </body>
+</html>

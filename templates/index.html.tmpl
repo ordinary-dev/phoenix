@@ -2,32 +2,54 @@
 <html lang="en">
     <head>
         {{template "head" .}}
-        <link rel="stylesheet" href="assets/css/index.css" />
+        <link rel="stylesheet" href="/assets/css/index-common.css" />
+        <link rel="stylesheet" href="/assets/css/index-{{ .style }}.css" />
     </head>
     <body>
         <div class="page">
-            <h1>{{.WebsiteTitle}}</h1>
-            {{if not .groups}}
+            <h1>{{ .title }}</h1>
+                
+            {{ if not .groups }}
             <p>
-                You don't have any links.
-                Go to <a href="/settings" style="text-decoration: underline">settings</a> and create one.
+                You don't have any links.<br />
+                Go to settings and create one.
             </p>
-            {{else}}
-            <a href="/settings">Settings</a>
-            {{end}}
+            {{ end }}
+
+            <div class="controls">
+                <a href="/settings">
+                    <img src="/assets/icons/solid/gear.svg" width="20" height="20" /> Settings
+                </a>
+                
+                {{ if ne .style "list" }}
+                <a href="/?style=list">
+                    <img src="/assets/icons/solid/list.svg" width="20" height="20" /> List
+                </a>
+                {{ end }}
+
+                {{ if ne .style "tiles" }}
+                <a href="/?style=tiles">
+                    <img src="/assets/icons/solid/table-cells-large.svg" width="20" height="20" /> Tiles
+                </a>
+                {{ end }}
+            </div>
             
             <div class="row">
                 {{range .groups}}
                 <div class="group">
                     <h2>{{.Name}}</h2>
+                    <div class="links">
                     {{range .Links}}
                         <a href="{{.Href}}" target="_blank" rel="noreferrer">
                             {{ if .Icon }}
                                 <img src="/assets/icons/{{.Icon}}.svg" width="20" height="20" />
+                            {{ else }}
+                                <img src="/assets/icons/solid/globe.svg" width="20" height="20" />
                             {{ end }}
                             {{.Name}}
                         </a>
                     {{end}}
+                    </div>
                 </div>
                 {{end}}
             </div>

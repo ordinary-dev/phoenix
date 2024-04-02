@@ -1,5 +1,5 @@
 {{define "head"}}
-<title>{{.WebsiteTitle}}</title>
+<title>{{ .title }}</title>
 <meta charset="utf-8" />
 <meta name="description" content="A minimalistic start page with your collection of links to important sites." />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="/assets/favicons/favicon-180.png" />
 <style>
 body {
-    font-family: {{.FontFamily}};
+    font-family: {{ .fontFamily }};
 }
 </style>
 {{end}}

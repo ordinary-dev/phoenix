@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        {{template "head" .}}
+        {{ template "head" . }}
         <link rel="stylesheet" href="assets/css/auth.css" />
     </head>
     <body>
         <div class="page">
-            <form action="{{.formAction}}" method="POST">
-                <h1>{{.title}}</h1>
-                <p>{{.description}}</p>
+            <form action="{{ .formAction }}" method="POST">
+                <h1>{{ .title }}</h1>
+                <p>{{ .description }}</p>
                 <input
                     placeholder="Username"
                     name="username"
