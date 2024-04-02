@@ -1,6 +1,6 @@
-FROM golang:1.22 AS builder
+FROM golang:1.22-alpine AS builder
 
-RUN apt install -y --no-install-recommends gcc
+RUN apk add --no-cache gcc libc-dev
 
 WORKDIR /app
 
@@ -11,7 +11,7 @@ ADD . .
 
 RUN go build -o main
 
-FROM debian:bookworm-slim
+FROM alpine:3.19
 
 WORKDIR /app
 COPY --from=builder /app/main /usr/local/bin/phoenix
@@ -20,7 +20,6 @@ COPY templates ./templates
 
 RUN mkdir /var/lib/phoenix
 ENV P_DBPATH="/var/lib/phoenix/db.sqlite3"
-ENV P_PRODUCTION="true"
 
 EXPOSE 8080
 
