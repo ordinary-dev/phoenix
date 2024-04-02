@@ -8,18 +8,18 @@
     <body>
         <div class="page">
             <h1>{{ .title }}</h1>
+                
+            {{ if not .groups }}
+            <p>
+                You don't have any links.<br />
+                Go to settings and create one.
+            </p>
+            {{ end }}
 
             <div class="controls">
-                {{if not .groups}}
-                <p>
-                    You don't have any links.
-                    Go to <a href="/settings" style="text-decoration: underline">settings</a> and create one.
-                </p>
-                {{else}}
                 <a href="/settings">
                     <img src="/assets/icons/solid/gear.svg" width="20" height="20" /> Settings
                 </a>
-                {{end}}
                 
                 {{ if ne .style "list" }}
                 <a href="/?style=list">
