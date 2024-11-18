@@ -15,8 +15,10 @@ FROM alpine:3.19
 
 WORKDIR /app
 COPY --from=builder /app/main /usr/local/bin/phoenix
-COPY assets ./assets
-COPY templates ./templates
+
+RUN mkdir web
+COPY web/assets ./web/assets
+COPY web/views ./web/views
 
 RUN mkdir /var/lib/phoenix
 ENV P_DBPATH="/var/lib/phoenix/db.sqlite3"

@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/ordinary-dev/phoenix/config"
 	"github.com/ordinary-dev/phoenix/database"
-	"github.com/ordinary-dev/phoenix/views"
+	"github.com/ordinary-dev/phoenix/web"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -50,7 +50,7 @@ func main() {
 		}
 	}
 
-	server, err := views.GetHttpServer()
+	server, err := web.GetHttpServer()
 	if err != nil {
 		log.Fatal(err)
 	}

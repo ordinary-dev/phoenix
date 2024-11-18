@@ -1,4 +1,4 @@
-package pages
+package controllers
 
 import (
 	"html/template"
@@ -20,7 +20,7 @@ var (
 // Preload all templates into `Templates` map.
 func LoadTemplates() error {
 	// Fragments are reusable parts of templates.
-	fragments, err := os.ReadDir("templates/fragments")
+	fragments, err := os.ReadDir("web/views/fragments")
 	if err != nil {
 		return err
 	}
@@ -29,12 +29,11 @@ func LoadTemplates() error {
 	for _, f := range fragments {
 		fragmentPaths = append(
 			fragmentPaths,
-			path.Join("templates/fragments", f.Name()),
+			path.Join("web/views/fragments", f.Name()),
 		)
 	}
 
-	// Load pages.
-	files, err := os.ReadDir("templates")
+	files, err := os.ReadDir("web/views")
 	if err != nil {
 		return err
 	}
@@ -44,7 +43,7 @@ func LoadTemplates() error {
 			continue
 		}
 
-		templatePaths := []string{path.Join("templates", f.Name())}
+		templatePaths := []string{path.Join("web/views", f.Name())}
 		templatePaths = append(templatePaths, fragmentPaths...)
 
 		tmpl, err := template.ParseFiles(templatePaths...)

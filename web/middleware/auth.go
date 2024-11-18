@@ -10,7 +10,7 @@ import (
 	"github.com/ordinary-dev/phoenix/config"
 	"github.com/ordinary-dev/phoenix/database"
 	"github.com/ordinary-dev/phoenix/jwttoken"
-	"github.com/ordinary-dev/phoenix/views/pages"
+	"github.com/ordinary-dev/phoenix/web/controllers"
 )
 
 // Try to find the access token in the request.
@@ -59,7 +59,7 @@ func RequireAuth(next http.Handler) http.Handler {
 		if err != nil {
 			count, err := database.CountAdmins()
 			if err != nil {
-				pages.ShowError(w, http.StatusInternalServerError, err)
+				controllers.ShowError(w, http.StatusInternalServerError, err)
 				return
 			}
 
@@ -76,7 +76,7 @@ func RequireAuth(next http.Handler) http.Handler {
 		if time.Now().Add(time.Second * (jwttoken.TOKEN_LIFETIME_IN_SECONDS / 2)).After(claims.ExpiresAt.Time) {
 			newToken, err := jwttoken.GetJWTToken()
 			if err != nil {
-				pages.ShowError(w, http.StatusInternalServerError, err)
+				controllers.ShowError(w, http.StatusInternalServerError, err)
 				return
 			}
 
