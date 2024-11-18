@@ -41,7 +41,6 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Try to create a user.
 	username := strings.TrimSpace(r.FormValue("username"))
 	password := strings.TrimSpace(r.FormValue("password"))
 	_, err = database.CreateAdmin(username, password)
@@ -58,6 +57,5 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	}
 	http.SetCookie(w, jwttoken.TokenToCookie(token))
 
-	// Redirect to homepage.
 	http.Redirect(w, r, "/", http.StatusFound)
 }

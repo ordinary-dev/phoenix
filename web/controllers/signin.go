@@ -18,7 +18,6 @@ func ShowSignInForm(w http.ResponseWriter, _ *http.Request) {
 }
 
 func AuthorizeUser(w http.ResponseWriter, r *http.Request) {
-	// Check credentials.
 	username := strings.TrimSpace(r.FormValue("username"))
 	password := strings.TrimSpace(r.FormValue("password"))
 	_, err := database.GetAdminIfPasswordMatches(username, password)
@@ -27,7 +26,6 @@ func AuthorizeUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Generate an access token.
 	token, err := jwttoken.GetJWTToken()
 	if err != nil {
 		ShowError(w, http.StatusInternalServerError, err)

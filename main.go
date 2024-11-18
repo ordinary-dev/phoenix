@@ -8,34 +8,29 @@ import (
 )
 
 func main() {
-	// Configure logger
 	log.SetFormatter(&log.TextFormatter{
 		FullTimestamp: true,
 	})
 
-	// Read config
 	cfg, err := config.GetConfig()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	// Set log level
 	logLevel := cfg.GetLogLevel()
 	log.SetLevel(logLevel)
 	log.Infof("Setting log level to %v", logLevel)
 
-	// Connect to the database
 	err = database.EstablishDatabaseConnection(cfg)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	// Apply migrations.
 	if err := database.ApplyMigrations(); err != nil {
 		log.Fatal(err)
 	}
 
-	// Create the first user
+	// Create the first user.
 	if cfg.DefaultUsername != "" && cfg.DefaultPassword != "" {
 		adminCount, err := database.CountAdmins()
 		if err != nil {

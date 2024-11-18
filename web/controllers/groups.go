@@ -10,7 +10,6 @@ import (
 )
 
 func CreateGroup(w http.ResponseWriter, r *http.Request) {
-	// Save new group to the database.
 	group := database.Group{
 		Name: strings.TrimSpace(r.FormValue("groupName")),
 	}
@@ -20,7 +19,6 @@ func CreateGroup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// This page is called from the settings, return the user back.
 	http.Redirect(w, r, fmt.Sprintf("/settings#group-%v", group.ID), http.StatusFound)
 }
 
@@ -37,7 +35,6 @@ func UpdateGroup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// This page is called from the settings, return the user back.
 	http.Redirect(w, r, fmt.Sprintf("/settings#group-%v", id), http.StatusFound)
 }
 
@@ -53,6 +50,5 @@ func DeleteGroup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Redirect to settings.
 	http.Redirect(w, r, "/settings", http.StatusFound)
 }

@@ -8,9 +8,6 @@ import (
 )
 
 // Create and configure an HTTP server.
-//
-// Unfortunately, I haven't found a way to use PUT and DELETE methods without JavaScript.
-// POST is used instead.
 func GetHttpServer() (*http.Server, error) {
 	if err := controllers.LoadTemplates(); err != nil {
 		return nil, err
@@ -36,21 +33,13 @@ func GetHttpServer() (*http.Server, error) {
 	protectedMux.HandleFunc("GET /settings", controllers.ShowSettings)
 
 	// Groups.
-
-	// Create group.
 	protectedMux.HandleFunc("POST /groups", controllers.CreateGroup)
-	// Update group.
 	protectedMux.HandleFunc("POST /groups/{id}/update", controllers.UpdateGroup)
-	// Delete group.
 	protectedMux.HandleFunc("POST /groups/{id}/delete", controllers.DeleteGroup)
 
 	// Links.
-
-	// Create link.
 	protectedMux.HandleFunc("POST /links", controllers.CreateLink)
-	// Update link.
 	protectedMux.HandleFunc("POST /links/{id}/update", controllers.UpdateLink)
-	// Delete link.
 	protectedMux.HandleFunc("POST /links/{id}/delete", controllers.DeleteLink)
 
 	// Import-export

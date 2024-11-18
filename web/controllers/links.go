@@ -32,7 +32,6 @@ func CreateLink(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Redirect to settings.
 	http.Redirect(w, r, fmt.Sprintf("/settings#link-%v", link.ID), http.StatusFound)
 }
 
@@ -63,7 +62,6 @@ func UpdateLink(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Redirect to settings.
 	http.Redirect(w, r, fmt.Sprintf("/settings#link-%v", link.ID), http.StatusFound)
 }
 
@@ -79,6 +77,5 @@ func DeleteLink(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Redirect to settings.
 	http.Redirect(w, r, "/settings", http.StatusFound)
 }
