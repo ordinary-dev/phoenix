@@ -3,7 +3,8 @@ package config
 import (
 	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
-	"github.com/sirupsen/logrus"
+	"log/slog"
+	"strings"
 )
 
 var Cfg Config
@@ -35,12 +36,9 @@ type Config struct {
 }
 
 func GetConfig() (*Config, error) {
-	err := godotenv.Load()
-	if err != nil {
-		logrus.Infof("Config: %v", err)
-	}
+	godotenv.Load()
 
-	err = envconfig.Process("p", &Cfg)
+	err := envconfig.Process("p", &Cfg)
 	if err != nil {
 		return nil, err
 	}
@@ -48,19 +46,17 @@ func GetConfig() (*Config, error) {
 	return &Cfg, nil
 }
 
-func (cfg *Config) GetLogLevel() logrus.Level {
-	switch cfg.LogLevel {
+func (cfg *Config) GetLogLevel() slog.Level {
+	switch strings.ToLower(cfg.LogLevel) {
 	case "debug":
-		return logrus.DebugLevel
+		return slog.LevelDebug
 	case "info":
-		return logrus.InfoLevel
+		return slog.LevelInfo
 	case "warning", "warn":
-		return logrus.WarnLevel
+		return slog.LevelWarn
 	case "error":
-		return logrus.ErrorLevel
-	case "fatal":
-		return logrus.FatalLevel
+		return slog.LevelError
 	default:
-		return logrus.WarnLevel
+		return slog.LevelWarn
 	}
 }

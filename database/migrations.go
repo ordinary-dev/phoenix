@@ -4,8 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-
-	log "github.com/sirupsen/logrus"
+	"log/slog"
 )
 
 // List of migrations that should be applied.
@@ -69,7 +68,7 @@ func ApplyMigrations() error {
 			return fmt.Errorf("migration #%d: %w", migrationID, err)
 		}
 
-		log.Infof("Migration #%v has been applied", migrationID)
+		slog.Info("migration has been applied", "id", migrationID)
 	}
 
 	return nil

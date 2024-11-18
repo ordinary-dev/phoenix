@@ -3,10 +3,9 @@ package controllers
 import (
 	"html/template"
 	"io"
+	"log/slog"
 	"os"
 	"path"
-
-	log "github.com/sirupsen/logrus"
 
 	"github.com/ordinary-dev/phoenix/config"
 )
@@ -52,7 +51,7 @@ func LoadTemplates() error {
 		}
 
 		templates[f.Name()] = tmpl
-		log.Infof("Template %v was loaded", f.Name())
+		slog.Debug("template was loaded", "file", f.Name())
 	}
 
 	return nil
@@ -67,6 +66,6 @@ func Render(template string, wr io.Writer, data map[string]any) {
 
 	err := templates[template].Execute(wr, data)
 	if err != nil {
-		log.WithField("template", template).Error(err)
+		slog.Error("template rendering failed", "err", err, "template", template)
 	}
 }

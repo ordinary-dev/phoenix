@@ -1,10 +1,9 @@
 package middleware
 
 import (
+	"log/slog"
 	"net/http"
 	"time"
-
-	log "github.com/sirupsen/logrus"
 )
 
 func LoggingMiddleware(next http.Handler) http.Handler {
@@ -13,10 +12,11 @@ func LoggingMiddleware(next http.Handler) http.Handler {
 
 		next.ServeHTTP(w, r)
 
-		log.WithFields(log.Fields{
-			"latency": time.Since(start),
-			"method":  r.Method,
-			"path":    r.URL.Path,
-		}).Info("Request")
+		slog.Info(
+			"request",
+			"latency", time.Since(start),
+			"method", r.Method,
+			"path", r.URL.Path,
+		)
 	})
 }
