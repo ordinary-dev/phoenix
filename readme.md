@@ -2,9 +2,13 @@
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/ordinary-dev/phoenix)](https://goreportcard.com/report/github.com/ordinary-dev/phoenix)
 
-![Screenshot](screenshot.webp)
-
 Self-hosted start page without the extra stuff.
+
+List view:
+![Screenshot (list view)](screenshot-list.webp)
+
+Tile view:
+![Screenshot (tile view)](screenshot-tiles.webp)
 
 ## Features
 - No javascript
