@@ -22,6 +22,8 @@ Tile view:
 
 Service settings can be set through environment variables.
 
+(You are reading documentation for a future version.)
+
 | Variable           | Description                                                      | Default                               |
 | ---                | ---                                                              | ---                                   |
 | DB_PATH            | Path to the sqlite database.                                     | Docker: `/var/lib/phoenix/db.sqlite3` |
