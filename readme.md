@@ -15,23 +15,25 @@ Self-hosted start page without the extra stuff.
 - Export and import
 
 ## Configuration
+
 Service settings can be set through environment variables.
 
-| Variable            | Description                                                      | Default                               |
-| ---                 | ---                                                              | ---                                   |
-| P_DBPATH            | Path to the sqlite database.                                     | Docker: `/var/lib/phoenix/db.sqlite3` |
-| P_SECRETKEY         | A long and random secret string used for authorization.          |                                       |
-| P_LOGLEVEL          | Log level settings: `debug`, `info`, `warning`, `error`, `fatal` | `warning`                             |
-| P_HEADERAUTH        | Enable Trusted Header Auth (SSO)                                 | `false`                               |
-| P_DEFAULTUSERNAME   | Data for the first user.                                         |                                       |
-| P_DEFAULTPASSWORD   | Data for the first user.                                         |                                       |
-| P_SECURECOOKIE      | Controls the "secure" option for a token cookie.                 | `true`                                |
+| Variable           | Description                                                      | Default                               |
+| ---                | ---                                                              | ---                                   |
+| DB_PATH            | Path to the sqlite database.                                     | Docker: `/var/lib/phoenix/db.sqlite3` |
+| SECRET_KEY         | A long and random secret string used for authorization.          |                                       |
+| LOG_LEVEL          | Log level settings: `debug`, `info`, `warning`, `error`          | `warning`                             |
+| HEADER_AUTH        | Enable Trusted Header Auth (SSO)                                 | `false`                               |
+| DEFAULT_USERNAME   | Data for the first user.                                         |                                       |
+| DEFAULT_PASSWORD   | Data for the first user.                                         |                                       |
+| SECURE_COOKIE      | Controls the "secure" option for a token cookie.                 | `true`                                |
 
 Appearance settings:
-| Variable            | Description                                                      | Default                               |
-| ---                 | ---                                                              | ---                                   |
-| P_TITLE             | Website title                                                    | `Phoenix`                             |
-| P_FONTFAMILY        | The font used on the site. Inserted directly into css.           | `sans-serif`                          |
+
+| Variable          | Description                                                      | Default                               |
+| ---               | ---                                                              | ---                                   |
+| TITLE             | Website title                                                    | `Phoenix`                             |
+| FONT_FAMILY       | The font used on the site. Inserted directly into css.           | `sans-serif`                          |
 
 ## Docker-compose example
 ```yml
@@ -43,9 +45,9 @@ services:
     ports:
       - 80:8080
     environment:
-      P_SECRETKEY: "your-random-string"
-      P_DEFAULTUSERNAME: "admin"
-      P_DEFAULTPASSWORD: "super-password"
+      SECRET_KEY: "your-random-string"
+      DEFAULT_USERNAME: "admin"
+      DEFAULT_PASSWORD: "super-password"
     restart: unless-stopped
 
 volumes:
