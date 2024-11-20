@@ -30,6 +30,14 @@ var migrations = []string{
             REFERENCES groups(id)
             ON DELETE CASCADE
     )`,
+	`ALTER TABLE admins RENAME TO users`,
+	`CREATE TABLE IF NOT EXISTS sessions (
+        token TEXT NOT NULL PRIMARY KEY,
+        user_id INTEGER NOT NULL
+            REFERENCES users(id)
+            ON DELETE CASCADE,
+        created_at INTEGER NOT NULL
+    )`,
 }
 
 func ApplyMigrations() error {

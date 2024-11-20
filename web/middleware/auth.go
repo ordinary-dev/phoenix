@@ -1,48 +1,34 @@
 package middleware
 
 import (
-	"fmt"
+	"log/slog"
 	"net/http"
 	"time"
 
-	"github.com/golang-jwt/jwt/v5"
-
 	"github.com/ordinary-dev/phoenix/config"
 	"github.com/ordinary-dev/phoenix/database"
-	"github.com/ordinary-dev/phoenix/jwttoken"
 	"github.com/ordinary-dev/phoenix/web/controllers"
+	"github.com/ordinary-dev/phoenix/web/sessions"
 )
 
 // Try to find the access token in the request.
 // Returns error if the user is not authorized.
 // If `nil` is returned instead of an error, it is safe to display protected content.
-func ParseToken(r *http.Request) (*jwt.RegisteredClaims, error) {
-	tokenCookie, err := r.Cookie(jwttoken.TOKEN_COOKIE_NAME)
+func ParseToken(r *http.Request) (*database.User, *database.Session, error) {
+	tokenCookie, err := r.Cookie(sessions.TokenCookieName)
 
 	// Anonymous visitor.
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	// Check token.
-	token, err := jwt.ParseWithClaims(tokenCookie.Value, &jwt.RegisteredClaims{}, func(token *jwt.Token) (interface{}, error) {
-		// Validate the alg.
-		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
-		}
-
-		return []byte(config.Cfg.SecretKey), nil
-	})
+	user, session, err := database.GetUserByToken(tokenCookie.Value)
 	if err != nil {
-		return nil, err
+		slog.Warn("session token is invalid", "err", err)
+		return nil, nil, err
 	}
 
-	claims, ok := token.Claims.(*jwt.RegisteredClaims)
-	if !ok || !token.Valid {
-		return nil, fmt.Errorf("token is invalid")
-	}
-
-	return claims, nil
+	return &user, &session, nil
 }
 
 func RequireAuth(next http.Handler) http.Handler {
@@ -53,11 +39,11 @@ func RequireAuth(next http.Handler) http.Handler {
 			return
 		}
 
-		claims, err := ParseToken(r)
+		user, sessionObj, err := ParseToken(r)
 
 		// Most likely the user is not authorized.
 		if err != nil {
-			count, err := database.CountAdmins()
+			count, err := database.CountUsers()
 			if err != nil {
 				controllers.ShowError(w, http.StatusInternalServerError, err)
 				return
@@ -72,15 +58,21 @@ func RequireAuth(next http.Handler) http.Handler {
 			return
 		}
 
-		// Create a new token if the old one is about to expire
-		if time.Now().Add(time.Second * (jwttoken.TOKEN_LIFETIME_IN_SECONDS / 2)).After(claims.ExpiresAt.Time) {
-			newToken, err := jwttoken.GetJWTToken()
+		// Create a new token if the old one is about to expire.
+		if sessionObj.CreatedAt.Add(database.TokenLifetime / 2).Before(time.Now()) {
+			err := database.DeleteSession(sessionObj.Token)
 			if err != nil {
 				controllers.ShowError(w, http.StatusInternalServerError, err)
 				return
 			}
 
-			http.SetCookie(w, jwttoken.TokenToCookie(newToken))
+			newSession, err := database.CreateSession(user.ID)
+			if err != nil {
+				controllers.ShowError(w, http.StatusInternalServerError, err)
+				return
+			}
+
+			http.SetCookie(w, sessions.SessionToCookie(newSession))
 		}
 
 		next.ServeHTTP(w, r)

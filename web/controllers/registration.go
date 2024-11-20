@@ -6,11 +6,11 @@ import (
 	"strings"
 
 	"github.com/ordinary-dev/phoenix/database"
-	"github.com/ordinary-dev/phoenix/jwttoken"
+	"github.com/ordinary-dev/phoenix/web/sessions"
 )
 
 func ShowRegistrationForm(w http.ResponseWriter, _ *http.Request) {
-	userCount, err := database.CountAdmins()
+	userCount, err := database.CountUsers()
 	if err != nil {
 		ShowError(w, http.StatusInternalServerError, err)
 		return
@@ -30,7 +30,7 @@ func ShowRegistrationForm(w http.ResponseWriter, _ *http.Request) {
 }
 
 func CreateUser(w http.ResponseWriter, r *http.Request) {
-	userCount, err := database.CountAdmins()
+	userCount, err := database.CountUsers()
 	if err != nil {
 		ShowError(w, http.StatusInternalServerError, err)
 		return
@@ -43,19 +43,19 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 
 	username := strings.TrimSpace(r.FormValue("username"))
 	password := strings.TrimSpace(r.FormValue("password"))
-	_, err = database.CreateAdmin(username, password)
+	user, err := database.CreateUser(username, password)
 	if err != nil {
 		ShowError(w, http.StatusInternalServerError, err)
 		return
 	}
 
 	// Generate access token.
-	token, err := jwttoken.GetJWTToken()
+	session, err := database.CreateSession(user.ID)
 	if err != nil {
 		ShowError(w, http.StatusInternalServerError, err)
 		return
 	}
-	http.SetCookie(w, jwttoken.TokenToCookie(token))
+	http.SetCookie(w, sessions.SessionToCookie(session))
 
 	http.Redirect(w, r, "/", http.StatusFound)
 }

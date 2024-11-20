@@ -33,14 +33,14 @@ func main() {
 
 	// Create the first user.
 	if cfg.DefaultUsername != "" && cfg.DefaultPassword != "" {
-		adminCount, err := database.CountAdmins()
+		userCount, err := database.CountUsers()
 		if err != nil {
 			slog.Error("can't query user count", "err", err)
 			os.Exit(-1)
 		}
 
-		if adminCount < 1 {
-			_, err := database.CreateAdmin(cfg.DefaultUsername, cfg.DefaultPassword)
+		if userCount < 1 {
+			_, err := database.CreateUser(cfg.DefaultUsername, cfg.DefaultPassword)
 			if err != nil {
 				slog.Error("can't create the first user", "err", err)
 				os.Exit(-1)
