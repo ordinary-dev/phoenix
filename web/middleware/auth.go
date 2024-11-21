@@ -66,7 +66,7 @@ func RequireAuth(next http.Handler) http.Handler {
 				return
 			}
 
-			newSession, err := database.CreateSession(user.ID)
+			newSession, err := database.CreateSession(user.Username)
 			if err != nil {
 				controllers.ShowError(w, http.StatusInternalServerError, err)
 				return

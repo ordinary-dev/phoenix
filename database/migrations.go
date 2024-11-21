@@ -38,6 +38,26 @@ var migrations = []string{
             ON DELETE CASCADE,
         created_at INTEGER NOT NULL
     )`,
+	// Use username as a primary key.
+	`CREATE TABLE new_users(
+        username TEXT NOT NULL PRIMARY KEY,
+        hashed_password TEXT
+    )`,
+	`INSERT INTO new_users(username, hashed_password)
+    SELECT username, bcrypt
+    FROM users`,
+	`ALTER TABLE sessions
+    ADD COLUMN username TEXT
+    REFERENCES new_users(username)
+    ON DELETE CASCADE`,
+	`UPDATE sessions SET username = (
+        SELECT username
+        FROM users
+        WHERE users.id = sessions.user_id
+    )`,
+	`ALTER TABLE sessions DROP COLUMN user_id`,
+	`DROP TABLE users`,
+	`ALTER TABLE new_users RENAME TO users`,
 }
 
 func ApplyMigrations() error {

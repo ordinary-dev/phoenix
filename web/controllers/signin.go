@@ -26,7 +26,7 @@ func AuthorizeUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	session, err := database.CreateSession(user.ID)
+	session, err := database.CreateSession(user.Username)
 	if err != nil {
 		ShowError(w, http.StatusInternalServerError, err)
 		return

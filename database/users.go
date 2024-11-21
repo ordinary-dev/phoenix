@@ -14,14 +14,13 @@ const (
 )
 
 type User struct {
-	ID       int
-	Username string
-	Bcrypt   string
+	Username       string
+	HashedPassword string
 }
 
 type Session struct {
 	Token     string
-	UserID    int
+	Username  string
 	CreatedAt time.Time
 }
 
@@ -39,26 +38,22 @@ func CreateUser(username string, password string) (*User, error) {
 	}
 
 	query := `
-        INSERT INTO users(username, bcrypt)
+        INSERT INTO users(username, hashed_password)
         VALUES (?, ?)
-        RETURNING id
     `
 
 	user := User{
-		Username: username,
-		Bcrypt:   string(hash),
+		Username:       username,
+		HashedPassword: string(hash),
 	}
 
-	err = DB.
-		QueryRow(query, user.Username, user.Bcrypt).
-		Scan(&user.ID)
-
+	_, err = DB.Exec(query, user.Username, user.HashedPassword)
 	return &user, err
 }
 
 func GetUserIfPasswordMatches(username string, password string) (*User, error) {
 	query := `
-        SELECT id, username, bcrypt
+        SELECT username, hashed_password
         FROM users
         WHERE username = ?
     `
@@ -66,13 +61,13 @@ func GetUserIfPasswordMatches(username string, password string) (*User, error) {
 	var user User
 	err := DB.
 		QueryRow(query, username).
-		Scan(&user.ID, &user.Username, &user.Bcrypt)
+		Scan(&user.Username, &user.HashedPassword)
 
 	if err != nil {
 		return nil, err
 	}
 
-	err = bcrypt.CompareHashAndPassword([]byte(user.Bcrypt), []byte(password))
+	err = bcrypt.CompareHashAndPassword([]byte(user.HashedPassword), []byte(password))
 	if err != nil {
 		return nil, err
 	}
@@ -80,13 +75,13 @@ func GetUserIfPasswordMatches(username string, password string) (*User, error) {
 	return &user, nil
 }
 
-func DeleteUser(id int) error {
+func DeleteUser(username string) error {
 	query := `
         DELETE FROM users
-        WHERE id = ?
+        WHERE username = ?
     `
 
-	res, err := DB.Exec(query, id)
+	res, err := DB.Exec(query, username)
 	if err != nil {
 		return err
 	}
@@ -104,7 +99,7 @@ func DeleteUser(id int) error {
 }
 
 // Create a session for the user.
-func CreateSession(userID int) (Session, error) {
+func CreateSession(username string) (Session, error) {
 	token := make([]byte, TokenLength)
 	_, err := rand.Read(token)
 	if err != nil {
@@ -113,16 +108,16 @@ func CreateSession(userID int) (Session, error) {
 
 	session := Session{
 		Token:     base64.StdEncoding.EncodeToString(token),
-		UserID:    userID,
+		Username:  username,
 		CreatedAt: time.Now(),
 	}
 
 	query := `
-        INSERT INTO sessions(token, user_id, created_at)
+        INSERT INTO sessions(token, username, created_at)
         VALUES (?, ?, ?)
     `
 
-	_, err = DB.Exec(query, session.Token, session.UserID, session.CreatedAt.Unix())
+	_, err = DB.Exec(query, session.Token, session.Username, session.CreatedAt.Unix())
 	return session, err
 }
 
@@ -130,10 +125,10 @@ func CreateSession(userID int) (Session, error) {
 // if the session has not expired.
 func GetUserByToken(token string) (User, Session, error) {
 	query := `
-        SELECT users.id, users.username, users.bcrypt, sessions.created_at
+        SELECT users.username, users.hashed_password, sessions.created_at
         FROM users
         INNER JOIN sessions
-        ON sessions.user_id = users.id
+        ON sessions.username = users.username
         WHERE sessions.token = ?
         AND sessions.created_at >= ?
     `
@@ -145,9 +140,9 @@ func GetUserByToken(token string) (User, Session, error) {
 	var createdAt int64
 	err := DB.
 		QueryRow(query, token, minCreatedAt).
-		Scan(&user.ID, &user.Username, &user.Bcrypt, &createdAt)
+		Scan(&user.Username, &user.HashedPassword, &createdAt)
 	session.Token = token
-	session.UserID = user.ID
+	session.Username = user.Username
 	session.CreatedAt = time.Unix(createdAt, 0)
 	return user, session, err
 }
