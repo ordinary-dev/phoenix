@@ -1,6 +1,16 @@
+@media screen and (min-width: 600px) {
+    .row {
+        gap: 2em;
+    }
+}
+
 .group {
     width: 100%;
     max-width: max-content;
+}
+
+.group h2 {
+    margin-top: 4px;
 }
 
 .links {
