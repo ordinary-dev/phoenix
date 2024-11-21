@@ -3,6 +3,7 @@ package database
 import (
 	"crypto/rand"
 	"encoding/base64"
+	"errors"
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
@@ -15,7 +16,7 @@ const (
 
 type User struct {
 	Username       string
-	HashedPassword string
+	HashedPassword *string
 }
 
 type Session struct {
@@ -31,23 +32,31 @@ func CountUsers() (int64, error) {
 	return count, err
 }
 
-func CreateUser(username string, password string) (*User, error) {
-	hash, err := bcrypt.GenerateFromPassword([]byte(password), 10)
-	if err != nil {
-		return nil, err
+// Create a new user.
+// Ignores the operation if the user exists.
+func CreateUser(username string, password *string) (*User, error) {
+	var hashedPassword *string
+	if password != nil {
+		rawHash, err := bcrypt.GenerateFromPassword([]byte(*password), 10)
+		if err != nil {
+			return nil, err
+		}
+		strHash := string(rawHash)
+		hashedPassword = &strHash
 	}
 
 	query := `
         INSERT INTO users(username, hashed_password)
         VALUES (?, ?)
+        ON CONFLICT DO NOTHING
     `
 
 	user := User{
 		Username:       username,
-		HashedPassword: string(hash),
+		HashedPassword: hashedPassword,
 	}
 
-	_, err = DB.Exec(query, user.Username, user.HashedPassword)
+	_, err := DB.Exec(query, user.Username, user.HashedPassword)
 	return &user, err
 }
 
@@ -67,7 +76,11 @@ func GetUserIfPasswordMatches(username string, password string) (*User, error) {
 		return nil, err
 	}
 
-	err = bcrypt.CompareHashAndPassword([]byte(user.HashedPassword), []byte(password))
+	if user.HashedPassword == nil {
+		return nil, errors.New("password was not set")
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(*user.HashedPassword), []byte(password))
 	if err != nil {
 		return nil, err
 	}

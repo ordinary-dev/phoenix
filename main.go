@@ -40,7 +40,7 @@ func main() {
 		}
 
 		if userCount < 1 {
-			_, err := database.CreateUser(cfg.DefaultUsername, cfg.DefaultPassword)
+			_, err := database.CreateUser(cfg.DefaultUsername, &cfg.DefaultPassword)
 			if err != nil {
 				slog.Error("can't create the first user", "err", err)
 				os.Exit(-1)

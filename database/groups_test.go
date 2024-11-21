@@ -10,9 +10,15 @@ func TestGroups(t *testing.T) {
 	initTestDatabase(t)
 	defer deleteTestDatabase(t)
 
+	user, err := CreateUser("group-test", nil)
+	if err != nil {
+		t.Fatalf("error creating user: %v", err)
+	}
+
 	// Create the first group.
 	group := Group{
-		Name: "test",
+		Name:     "test",
+		Username: &user.Username,
 	}
 	if err := CreateGroup(&group); err != nil {
 		t.Fatal(err)
@@ -27,7 +33,7 @@ func TestGroups(t *testing.T) {
 	}
 
 	// Read groups.
-	groupList, err := GetGroupsWithLinks()
+	groupList, err := GetGroupsWithLinks(&user.Username)
 	if err != nil {
 		t.Fatal(err)
 	}

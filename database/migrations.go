@@ -58,6 +58,13 @@ var migrations = []string{
 	`ALTER TABLE sessions DROP COLUMN user_id`,
 	`DROP TABLE users`,
 	`ALTER TABLE new_users RENAME TO users`,
+	// Assign groups to users.
+	`ALTER TABLE groups
+    ADD COLUMN username TEXT
+    REFERENCES users(username)
+    ON DELETE CASCADE`,
+	`UPDATE groups
+    SET username = (SELECT username FROM users LIMIT 1)`,
 }
 
 func ApplyMigrations() error {

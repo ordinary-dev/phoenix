@@ -10,17 +10,6 @@ import (
 )
 
 func ShowRegistrationForm(w http.ResponseWriter, _ *http.Request) {
-	userCount, err := database.CountUsers()
-	if err != nil {
-		ShowError(w, http.StatusInternalServerError, err)
-		return
-	}
-
-	if userCount > 0 {
-		ShowError(w, http.StatusBadRequest, errors.New("at least 1 user already exists"))
-		return
-	}
-
 	Render("auth.html.tmpl", w, map[string]any{
 		"title":       "Create an account",
 		"description": "To prevent other people from seeing your links, create an account.",
@@ -43,7 +32,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 
 	username := strings.TrimSpace(r.FormValue("username"))
 	password := strings.TrimSpace(r.FormValue("password"))
-	user, err := database.CreateUser(username, password)
+	user, err := database.CreateUser(username, &password)
 	if err != nil {
 		ShowError(w, http.StatusInternalServerError, err)
 		return

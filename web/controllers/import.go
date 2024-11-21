@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/ordinary-dev/phoenix/database"
+	"github.com/ordinary-dev/phoenix/web/sessions"
 )
 
 func ImportPage(w http.ResponseWriter, _ *http.Request) {
@@ -19,7 +20,9 @@ func Import(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	username := sessions.GetUsername(r.Context())
 	for _, g := range exportFile.Groups {
+		g.Username = &username
 		if err := database.CreateGroup(&g); err != nil {
 			ShowError(w, http.StatusInternalServerError, err)
 			return

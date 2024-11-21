@@ -34,7 +34,32 @@ func ParseToken(r *http.Request) (*database.User, *database.Session, error) {
 func RequireAuth(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Check if SSO is enabled.
-		if config.Cfg.HeaderAuth && r.Header.Get("Remote-User") != "" {
+		remoteUser := r.Header.Get("Remote-User")
+		if config.Cfg.HeaderAuth && remoteUser != "" {
+			_, err := database.CreateUser(remoteUser, nil)
+			if err != nil {
+				controllers.ShowError(w, http.StatusInternalServerError, err)
+				return
+			}
+
+			count, err := database.CountUsers()
+			if err != nil {
+				controllers.ShowError(w, http.StatusInternalServerError, err)
+				return
+			}
+
+			// If we have only one user, assign him all groups without owner.
+			// We originally did not store remote users in the database,
+			// so migrations cannot automatically assign groups to a user.
+			if count == 1 {
+				err := database.TransferGroups(nil, &remoteUser)
+				if err != nil {
+					controllers.ShowError(w, http.StatusInternalServerError, err)
+					return
+				}
+			}
+
+			r = sessions.AddUsernameToContext(r, remoteUser)
 			next.ServeHTTP(w, r)
 			return
 		}
@@ -75,6 +100,7 @@ func RequireAuth(next http.Handler) http.Handler {
 			http.SetCookie(w, sessions.SessionToCookie(newSession))
 		}
 
+		r = sessions.AddUsernameToContext(r, user.Username)
 		next.ServeHTTP(w, r)
 	})
 }

@@ -5,14 +5,16 @@ import (
 	"net/http"
 
 	"github.com/ordinary-dev/phoenix/database"
+	"github.com/ordinary-dev/phoenix/web/sessions"
 )
 
 type ExportFile struct {
 	Groups []database.Group `json:"groups"`
 }
 
-func Export(w http.ResponseWriter, _ *http.Request) {
-	groups, err := database.GetGroupsWithLinks()
+func Export(w http.ResponseWriter, r *http.Request) {
+	username := sessions.GetUsername(r.Context())
+	groups, err := database.GetGroupsWithLinks(&username)
 	if err != nil {
 		ShowError(w, http.StatusInternalServerError, err)
 		return

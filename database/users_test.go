@@ -23,7 +23,7 @@ func TestUsers(t *testing.T) {
 	// Create the first user.
 	username := "test"
 	password := "test"
-	user, err := CreateUser(username, password)
+	user, err := CreateUser(username, &password)
 	if err != nil {
 		t.Errorf("error creating user: %v", err)
 	}
