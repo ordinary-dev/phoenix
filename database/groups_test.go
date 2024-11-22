@@ -46,6 +46,12 @@ func TestGroups(t *testing.T) {
 		t.Fatal("wrong group name")
 	}
 
+	// Transfer ownership.
+	err = TransferGroups(&user.Username, nil)
+	if err != nil {
+		t.Errorf("error when changing owner: %v", err)
+	}
+
 	// Delete group.
 	if err := DeleteGroup(group.ID); err != nil {
 		t.Fatal(err)
