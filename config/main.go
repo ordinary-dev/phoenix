@@ -28,7 +28,7 @@ func getStrFromEnv(defaultValue string, varNames ...string) string {
 	return defaultValue
 }
 
-func getBoolFromStr(defaultValue bool, varNames ...string) bool {
+func getBoolFromEnv(defaultValue bool, varNames ...string) bool {
 	res := getStrFromEnv("", varNames...)
 	if res == "" {
 		return defaultValue
@@ -52,10 +52,11 @@ type Config struct {
 	// Don't use it if you don't know why you need it.
 	HeaderAuth bool
 
-	// Data for the first user.
-	// Optional, the site also allows you to create the first user.
+	// Data for the first user (optional).
 	DefaultUsername string
 	DefaultPassword string
+	// Allow registration via web interface?
+	EnableRegistration bool
 
 	// Controls the "secure" option for a token cookie.
 	SecureCookie bool
@@ -80,10 +81,13 @@ func GetConfig() (*Config, error) {
 	}
 
 	Cfg.LogLevel = getStrFromEnv("warning", "LOG_LEVEL", "P_LOGLEVEL")
-	Cfg.HeaderAuth = getBoolFromStr(false, "HEADER_AUTH", "P_HEADERAUTH")
+	Cfg.HeaderAuth = getBoolFromEnv(false, "HEADER_AUTH", "P_HEADERAUTH")
+
 	Cfg.DefaultUsername = getStrFromEnv("", "DEFAULT_USERNAME", "P_DEFAULTUSERNAME")
 	Cfg.DefaultPassword = getStrFromEnv("", "DEFAULT_PASSWORD", "P_DEFAULTPASSWORD")
-	Cfg.SecureCookie = getBoolFromStr(true, "SECURE_COOKIE", "P_SECURECOOKIE")
+	Cfg.EnableRegistration = getBoolFromEnv(true, "ENABLE_REGISTRATION")
+
+	Cfg.SecureCookie = getBoolFromEnv(true, "SECURE_COOKIE", "P_SECURECOOKIE")
 	Cfg.Title = getStrFromEnv("Phoenix", "TITLE", "P_TITLE")
 	Cfg.FontFamily = getStrFromEnv("sans-serif", "FONT_FAMILY", "P_FONTFAMILY")
 
