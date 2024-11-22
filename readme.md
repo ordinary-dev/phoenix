@@ -27,7 +27,6 @@ Service settings can be set through environment variables.
 | Variable           | Description                                                      | Default                               |
 | ---                | ---                                                              | ---                                   |
 | DB_PATH            | Path to the sqlite database.                                     | Docker: `/var/lib/phoenix/db.sqlite3` |
-| SECRET_KEY         | A long and random secret string used for authorization.          |                                       |
 | LOG_LEVEL          | Log level settings: `debug`, `info`, `warning`, `error`          | `warning`                             |
 | HEADER_AUTH        | Enable Trusted Header Auth (SSO)                                 | `false`                               |
 | DEFAULT_USERNAME   | Data for the first user.                                         |                                       |
@@ -51,7 +50,6 @@ services:
     ports:
       - 80:8080
     environment:
-      SECRET_KEY: "your-random-string"
       DEFAULT_USERNAME: "admin"
       DEFAULT_PASSWORD: "super-password"
     restart: unless-stopped

@@ -41,8 +41,6 @@ func getBoolFromEnv(defaultValue bool, varNames ...string) bool {
 var Cfg Config
 
 type Config struct {
-	// A long and random secret string used for authorization.
-	SecretKey string
 	// Path to the sqlite database.
 	DBPath string
 
@@ -69,11 +67,6 @@ type Config struct {
 
 func GetConfig() (*Config, error) {
 	godotenv.Load()
-
-	Cfg.SecretKey = getStrFromEnv("", "SECRET_KEY", "P_SECRETKEY")
-	if Cfg.SecretKey == "" {
-		return nil, errors.New("secret key is undefined, set it using SECRET_KEY environment variable")
-	}
 
 	Cfg.DBPath = getStrFromEnv("", "DB_PATH", "P_DBPATH")
 	if Cfg.DBPath == "" {
