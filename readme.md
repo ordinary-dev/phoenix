@@ -24,14 +24,15 @@ Service settings can be set through environment variables.
 
 (You are reading documentation for a future version.)
 
-| Variable           | Description                                                      | Default                               |
-| ---                | ---                                                              | ---                                   |
-| DB_PATH            | Path to the sqlite database.                                     | Docker: `/var/lib/phoenix/db.sqlite3` |
-| LOG_LEVEL          | Log level settings: `debug`, `info`, `warning`, `error`          | `warning`                             |
-| HEADER_AUTH        | Enable Trusted Header Auth (SSO)                                 | `false`                               |
-| DEFAULT_USERNAME   | Data for the first user.                                         |                                       |
-| DEFAULT_PASSWORD   | Data for the first user.                                         |                                       |
-| SECURE_COOKIE      | Controls the "secure" option for a token cookie.                 | `true`                                |
+| Variable            | Description                                                      | Default                               |
+| ---                 | ---                                                              | ---                                   |
+| DB_PATH             | Path to the sqlite database.                                     | Docker: `/var/lib/phoenix/db.sqlite3` |
+| LOG_LEVEL           | Log level settings: `debug`, `info`, `warning`, `error`          | `warning`                             |
+| HEADER_AUTH         | Enable Trusted Header Auth (SSO)                                 | `false`                               |
+| DEFAULT_USERNAME    | Data for the first user.                                         |                                       |
+| DEFAULT_PASSWORD    | Data for the first user.                                         |                                       |
+| ENABLE_REGISTRATION | Allow registration via web interface?                            | `true`                                |
+| SECURE_COOKIE       | Controls the "secure" option for a token cookie.                 | `true`                                |
 
 Appearance settings:
 
@@ -49,9 +50,6 @@ services:
       - phoenix:/var/lib/phoenix
     ports:
       - 80:8080
-    environment:
-      DEFAULT_USERNAME: "admin"
-      DEFAULT_PASSWORD: "super-password"
     restart: unless-stopped
 
 volumes:
