@@ -62,6 +62,21 @@ func CreateGroup(group *Group) error {
 	return nil
 }
 
+// Get group by id without child links.
+func GetGroup(id int) (Group, error) {
+	query := `
+        SELECT name, username
+        FROM groups
+        WHERE id = ?
+    `
+
+	group := Group{
+		ID: id,
+	}
+	err := DB.QueryRow(query, id).Scan(&group.Name, &group.Username)
+	return group, err
+}
+
 // Transfer groups from one owner to another.
 func TransferGroups(from, to *string) error {
 	query := `

@@ -27,6 +27,11 @@ func TestGroups(t *testing.T) {
 		t.Fatal("group id is zero")
 	}
 
+	_, err = GetGroup(group.ID)
+	if err != nil {
+		t.Errorf("can't get the group: %v", err)
+	}
+
 	// Update group.
 	if err := UpdateGroup(group.ID, "new-name"); err != nil {
 		t.Fatal(err)
