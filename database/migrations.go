@@ -4,8 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-
-	log "github.com/sirupsen/logrus"
+	"log/slog"
 )
 
 // List of migrations that should be applied.
@@ -31,6 +30,41 @@ var migrations = []string{
             REFERENCES groups(id)
             ON DELETE CASCADE
     )`,
+	`ALTER TABLE admins RENAME TO users`,
+	`CREATE TABLE IF NOT EXISTS sessions (
+        token TEXT NOT NULL PRIMARY KEY,
+        user_id INTEGER NOT NULL
+            REFERENCES users(id)
+            ON DELETE CASCADE,
+        created_at INTEGER NOT NULL
+    )`,
+	// Use username as a primary key.
+	`CREATE TABLE new_users(
+        username TEXT NOT NULL PRIMARY KEY,
+        hashed_password TEXT
+    )`,
+	`INSERT INTO new_users(username, hashed_password)
+    SELECT username, bcrypt
+    FROM users`,
+	`ALTER TABLE sessions
+    ADD COLUMN username TEXT
+    REFERENCES new_users(username)
+    ON DELETE CASCADE`,
+	`UPDATE sessions SET username = (
+        SELECT username
+        FROM users
+        WHERE users.id = sessions.user_id
+    )`,
+	`ALTER TABLE sessions DROP COLUMN user_id`,
+	`DROP TABLE users`,
+	`ALTER TABLE new_users RENAME TO users`,
+	// Assign groups to users.
+	`ALTER TABLE groups
+    ADD COLUMN username TEXT
+    REFERENCES users(username)
+    ON DELETE CASCADE`,
+	`UPDATE groups
+    SET username = (SELECT username FROM users LIMIT 1)`,
 }
 
 func ApplyMigrations() error {
@@ -69,7 +103,7 @@ func ApplyMigrations() error {
 			return fmt.Errorf("migration #%d: %w", migrationID, err)
 		}
 
-		log.Infof("Migration #%v has been applied", migrationID)
+		slog.Info("migration has been applied", "id", migrationID)
 	}
 
 	return nil

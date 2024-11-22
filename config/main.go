@@ -1,66 +1,103 @@
 package config
 
 import (
+	"errors"
+	"fmt"
+	"log/slog"
+	"os"
+	"strings"
+
 	"github.com/joho/godotenv"
-	"github.com/kelseyhightower/envconfig"
-	"github.com/sirupsen/logrus"
 )
+
+func getStrFromEnv(defaultValue string, varNames ...string) string {
+	for i, name := range varNames {
+		res := os.Getenv(name)
+		if res == "" {
+			continue
+		}
+
+		if i > 0 {
+			msg := fmt.Sprintf("'%s' is deprecated, use '%s' instead", varNames[i], varNames[0])
+			slog.Warn(msg)
+		}
+
+		return res
+	}
+
+	return defaultValue
+}
+
+func getBoolFromEnv(defaultValue bool, varNames ...string) bool {
+	res := getStrFromEnv("", varNames...)
+	if res == "" {
+		return defaultValue
+	}
+
+	res = strings.ToLower(res)
+	return res == "true" || res == "1"
+}
 
 var Cfg Config
 
 type Config struct {
-	// A long and random secret string used for authorization.
-	SecretKey string `required:"true"`
 	// Path to the sqlite database.
-	DBPath string `required:"true"`
+	DBPath string
 
-	LogLevel string `default:"warning"`
+	LogLevel string
 
 	// Allows you to skip authorization if the "Remote-User" header is specified.
 	// Don't use it if you don't know why you need it.
-	HeaderAuth bool `default:"false"`
+	HeaderAuth bool
 
-	// Data for the first user.
-	// Optional, the site also allows you to create the first user.
+	// Data for the first user (optional).
 	DefaultUsername string
 	DefaultPassword string
+	// Allow registration via web interface?
+	EnableRegistration bool
 
 	// Controls the "secure" option for a token cookie.
-	SecureCookie bool `default:"true"`
+	SecureCookie bool
 
 	// Site title.
-	Title string `default:"Phoenix"`
+	Title string
 	// Any supported css value, embedded directly into every page.
-	FontFamily string `default:"sans-serif"`
+	FontFamily string
 }
 
 func GetConfig() (*Config, error) {
-	err := godotenv.Load()
-	if err != nil {
-		logrus.Infof("Config: %v", err)
+	godotenv.Load()
+
+	Cfg.DBPath = getStrFromEnv("", "DB_PATH", "P_DBPATH")
+	if Cfg.DBPath == "" {
+		return nil, errors.New("database path is undefined, set it using DB_PATH environment variable")
 	}
 
-	err = envconfig.Process("p", &Cfg)
-	if err != nil {
-		return nil, err
-	}
+	Cfg.LogLevel = getStrFromEnv("warning", "LOG_LEVEL", "P_LOGLEVEL")
+	Cfg.HeaderAuth = getBoolFromEnv(false, "HEADER_AUTH", "P_HEADERAUTH")
+
+	Cfg.DefaultUsername = getStrFromEnv("", "DEFAULT_USERNAME", "P_DEFAULTUSERNAME")
+	Cfg.DefaultPassword = getStrFromEnv("", "DEFAULT_PASSWORD", "P_DEFAULTPASSWORD")
+	Cfg.EnableRegistration = getBoolFromEnv(true, "ENABLE_REGISTRATION")
+
+	Cfg.SecureCookie = getBoolFromEnv(true, "SECURE_COOKIE", "P_SECURECOOKIE")
+	Cfg.Title = getStrFromEnv("Phoenix", "TITLE", "P_TITLE")
+	Cfg.FontFamily = getStrFromEnv("sans-serif", "FONT_FAMILY", "P_FONTFAMILY")
 
 	return &Cfg, nil
 }
 
-func (cfg *Config) GetLogLevel() logrus.Level {
-	switch cfg.LogLevel {
+func (cfg *Config) GetLogLevel() slog.Level {
+	switch strings.ToLower(cfg.LogLevel) {
 	case "debug":
-		return logrus.DebugLevel
+		return slog.LevelDebug
 	case "info":
-		return logrus.InfoLevel
+		return slog.LevelInfo
 	case "warning", "warn":
-		return logrus.WarnLevel
+		return slog.LevelWarn
 	case "error":
-		return logrus.ErrorLevel
-	case "fatal":
-		return logrus.FatalLevel
+		return slog.LevelError
 	default:
-		return logrus.WarnLevel
+		return slog.LevelWarn
 	}
 }

@@ -13,9 +13,6 @@
     .page {
         padding: 2em 10em
     }
-    .row {
-        gap: 4em;
-    }
 }
 
 .controls {
@@ -35,7 +32,6 @@
 }
 
 h2 {
-    margin-top: 18px;
     margin-bottom: 6px;
 }
 

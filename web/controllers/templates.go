@@ -1,12 +1,11 @@
-package pages
+package controllers
 
 import (
 	"html/template"
 	"io"
+	"log/slog"
 	"os"
 	"path"
-
-	log "github.com/sirupsen/logrus"
 
 	"github.com/ordinary-dev/phoenix/config"
 )
@@ -20,7 +19,7 @@ var (
 // Preload all templates into `Templates` map.
 func LoadTemplates() error {
 	// Fragments are reusable parts of templates.
-	fragments, err := os.ReadDir("templates/fragments")
+	fragments, err := os.ReadDir("web/views/fragments")
 	if err != nil {
 		return err
 	}
@@ -29,12 +28,11 @@ func LoadTemplates() error {
 	for _, f := range fragments {
 		fragmentPaths = append(
 			fragmentPaths,
-			path.Join("templates/fragments", f.Name()),
+			path.Join("web/views/fragments", f.Name()),
 		)
 	}
 
-	// Load pages.
-	files, err := os.ReadDir("templates")
+	files, err := os.ReadDir("web/views")
 	if err != nil {
 		return err
 	}
@@ -44,7 +42,7 @@ func LoadTemplates() error {
 			continue
 		}
 
-		templatePaths := []string{path.Join("templates", f.Name())}
+		templatePaths := []string{path.Join("web/views", f.Name())}
 		templatePaths = append(templatePaths, fragmentPaths...)
 
 		tmpl, err := template.ParseFiles(templatePaths...)
@@ -53,7 +51,7 @@ func LoadTemplates() error {
 		}
 
 		templates[f.Name()] = tmpl
-		log.Infof("Template %v was loaded", f.Name())
+		slog.Debug("template was loaded", "file", f.Name())
 	}
 
 	return nil
@@ -68,6 +66,6 @@ func Render(template string, wr io.Writer, data map[string]any) {
 
 	err := templates[template].Execute(wr, data)
 	if err != nil {
-		log.WithField("template", template).Error(err)
+		slog.Error("template rendering failed", "err", err, "template", template)
 	}
 }

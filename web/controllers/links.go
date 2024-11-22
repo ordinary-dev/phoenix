@@ -1,18 +1,32 @@
-package pages
+package controllers
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
 
 	"github.com/ordinary-dev/phoenix/database"
+	"github.com/ordinary-dev/phoenix/web/sessions"
 )
 
 func CreateLink(w http.ResponseWriter, r *http.Request) {
 	groupID, err := strconv.Atoi(r.FormValue("groupID"))
 	if err != nil {
 		ShowError(w, http.StatusBadRequest, err)
+		return
+	}
+
+	group, err := database.GetGroup(int(groupID))
+	if err != nil {
+		ShowError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	username := sessions.GetUsername(r.Context())
+	if group.Username == nil || *group.Username != username {
+		ShowError(w, http.StatusForbidden, errors.New("you are not the owner of the group"))
 		return
 	}
 
@@ -32,7 +46,6 @@ func CreateLink(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Redirect to settings.
 	http.Redirect(w, r, fmt.Sprintf("/settings#link-%v", link.ID), http.StatusFound)
 }
 
@@ -46,6 +59,18 @@ func UpdateLink(w http.ResponseWriter, r *http.Request) {
 	link, err := database.GetLink(id)
 	if err != nil {
 		ShowError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	group, err := database.GetGroup(int(link.GroupID))
+	if err != nil {
+		ShowError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	username := sessions.GetUsername(r.Context())
+	if group.Username == nil || *group.Username != username {
+		ShowError(w, http.StatusForbidden, errors.New("you are not the owner of the group"))
 		return
 	}
 
@@ -63,7 +88,6 @@ func UpdateLink(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Redirect to settings.
 	http.Redirect(w, r, fmt.Sprintf("/settings#link-%v", link.ID), http.StatusFound)
 }
 
@@ -74,11 +98,28 @@ func DeleteLink(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	link, err := database.GetLink(id)
+	if err != nil {
+		ShowError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	group, err := database.GetGroup(int(link.GroupID))
+	if err != nil {
+		ShowError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	username := sessions.GetUsername(r.Context())
+	if group.Username == nil || *group.Username != username {
+		ShowError(w, http.StatusForbidden, errors.New("you are not the owner of the group"))
+		return
+	}
+
 	if err := database.DeleteLink(id); err != nil {
 		ShowError(w, http.StatusInternalServerError, err)
 		return
 	}
 
-	// Redirect to settings.
 	http.Redirect(w, r, "/settings", http.StatusFound)
 }

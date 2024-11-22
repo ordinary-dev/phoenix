@@ -1,19 +1,21 @@
 package database
 
 type Group struct {
-	ID    int    `json:"id"`
-	Name  string `json:"name"`
-	Links []Link `json:"links"`
+	ID       int     `json:"id"`
+	Name     string  `json:"name"`
+	Username *string `json:"-"`
+	Links    []Link  `json:"links"`
 }
 
-func GetGroupsWithLinks() ([]Group, error) {
+func GetGroupsWithLinks(username *string) ([]Group, error) {
 	query := `
         SELECT id, name
         FROM groups
+        WHERE username = ?
         ORDER BY groups.id
     `
 
-	rows, err := DB.Query(query)
+	rows, err := DB.Query(query, username)
 	if err != nil {
 		return nil, err
 	}
@@ -21,7 +23,9 @@ func GetGroupsWithLinks() ([]Group, error) {
 
 	var groups []Group
 	for rows.Next() {
-		var group Group
+		group := Group{
+			Username: username,
+		}
 		if err := rows.Scan(&group.ID, &group.Name); err != nil {
 			return nil, err
 		}
@@ -46,16 +50,42 @@ func GetGroupsWithLinks() ([]Group, error) {
 // The function fills in the ID.
 func CreateGroup(group *Group) error {
 	query := `
-        INSERT INTO groups (name)
-        VALUES (?)
+        INSERT INTO groups (name, username)
+        VALUES (?, ?)
         RETURNING id
     `
 
-	if err := DB.QueryRow(query, group.Name).Scan(&group.ID); err != nil {
+	if err := DB.QueryRow(query, group.Name, group.Username).Scan(&group.ID); err != nil {
 		return err
 	}
 
 	return nil
+}
+
+// Get group by id without child links.
+func GetGroup(id int) (Group, error) {
+	query := `
+        SELECT name, username
+        FROM groups
+        WHERE id = ?
+    `
+
+	group := Group{
+		ID: id,
+	}
+	err := DB.QueryRow(query, id).Scan(&group.Name, &group.Username)
+	return group, err
+}
+
+// Transfer groups from one owner to another.
+func TransferGroups(from, to *string) error {
+	query := `
+        UPDATE groups
+        SET username = ?
+        WHERE username = ?
+    `
+	_, err := DB.Exec(query, to, from)
+	return err
 }
 
 func UpdateGroup(id int, name string) error {

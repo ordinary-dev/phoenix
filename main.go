@@ -3,56 +3,55 @@ package main
 import (
 	"github.com/ordinary-dev/phoenix/config"
 	"github.com/ordinary-dev/phoenix/database"
-	"github.com/ordinary-dev/phoenix/views"
-	log "github.com/sirupsen/logrus"
+	"github.com/ordinary-dev/phoenix/web"
+	"log/slog"
+	"os"
 )
 
 func main() {
-	// Configure logger
-	log.SetFormatter(&log.TextFormatter{
-		FullTimestamp: true,
-	})
-
-	// Read config
 	cfg, err := config.GetConfig()
 	if err != nil {
-		log.Fatal(err)
+		slog.Error("configuration loading failed", "err", err)
+		os.Exit(-1)
 	}
 
-	// Set log level
-	logLevel := cfg.GetLogLevel()
-	log.SetLevel(logLevel)
-	log.Infof("Setting log level to %v", logLevel)
+	logger := slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{
+		Level: cfg.GetLogLevel(),
+	})
+	slog.SetDefault(slog.New(logger))
 
-	// Connect to the database
 	err = database.EstablishDatabaseConnection(cfg)
 	if err != nil {
-		log.Fatal(err)
+		slog.Error("can't connect to the database", "err", err)
+		os.Exit(-1)
 	}
 
-	// Apply migrations.
 	if err := database.ApplyMigrations(); err != nil {
-		log.Fatal(err)
+		slog.Error("can't apply database migrations", "err", err)
+		os.Exit(-1)
 	}
 
-	// Create the first user
+	// Create the first user.
 	if cfg.DefaultUsername != "" && cfg.DefaultPassword != "" {
-		adminCount, err := database.CountAdmins()
+		userCount, err := database.CountUsers()
 		if err != nil {
-			log.Fatal(err)
+			slog.Error("can't query user count", "err", err)
+			os.Exit(-1)
 		}
 
-		if adminCount < 1 {
-			_, err := database.CreateAdmin(cfg.DefaultUsername, cfg.DefaultPassword)
+		if userCount < 1 {
+			_, err := database.CreateUser(cfg.DefaultUsername, &cfg.DefaultPassword)
 			if err != nil {
-				log.Fatal(err)
+				slog.Error("can't create the first user", "err", err)
+				os.Exit(-1)
 			}
 		}
 	}
 
-	server, err := views.GetHttpServer()
+	server, err := web.GetHttpServer()
 	if err != nil {
-		log.Fatal(err)
+		slog.Error("unable to create a web server", "err", err)
+		os.Exit(-1)
 	}
 
 	server.ListenAndServe()

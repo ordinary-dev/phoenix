@@ -1,13 +1,16 @@
-package pages
+package controllers
 
 import (
+	"log/slog"
 	"net/http"
-
-	log "github.com/sirupsen/logrus"
 )
 
 func ShowError(w http.ResponseWriter, statusCode int, err error) {
-	log.WithField("code", statusCode).Error(err)
+	if statusCode < 500 {
+		slog.Warn("request failed", "err", err, "code", statusCode)
+	} else {
+		slog.Error("request failed", "err", err, "code", statusCode)
+	}
 
 	w.WriteHeader(statusCode)
 	Render("error.html.tmpl", w, map[string]any{
