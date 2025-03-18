@@ -32,6 +32,13 @@ Service settings can be set through environment variables.
 | ENABLE_REGISTRATION | Allow registration via web interface?                            | `true`                                |
 | SECURE_COOKIE       | Controls the "secure" option for a token cookie.                 | `true`                                |
 
+HTTP server settings:
+
+| Variable          | Description                                                                                 | Default       |
+| ---               | ---                                                                                         | ---           |
+| SOCKET_PATH       | Unix socket path.                                                                           |               |
+| LISTENING_ADDRESS | Listening address, for example: `:80` or `127.0.0.1:8080`. Ignored if `SOCKET_PATH` is set. | `:8080`       |
+
 Appearance settings:
 
 | Variable          | Description                                                      | Default                               |

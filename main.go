@@ -1,12 +1,29 @@
 package main
 
 import (
+	"context"
 	"github.com/ordinary-dev/phoenix/config"
 	"github.com/ordinary-dev/phoenix/database"
 	"github.com/ordinary-dev/phoenix/web"
 	"log/slog"
+	"net"
+	"net/http"
 	"os"
+	"os/signal"
 )
+
+func handleInterrupt(srv *http.Server, connsClosed chan struct{}) {
+	sigint := make(chan os.Signal, 1)
+	signal.Notify(sigint, os.Interrupt)
+	<-sigint
+
+	// We received an interrupt signal, shut down.
+	if err := srv.Shutdown(context.Background()); err != nil {
+		slog.Info("HTTP server shutdown", "err", err)
+	}
+
+	close(connsClosed)
+}
 
 func main() {
 	cfg, err := config.GetConfig()
@@ -48,11 +65,37 @@ func main() {
 		}
 	}
 
-	server, err := web.GetHttpServer()
+	handler, err := web.GetHandler()
 	if err != nil {
 		slog.Error("unable to create a web server", "err", err)
 		os.Exit(-1)
 	}
 
-	server.ListenAndServe()
+	http.Handle("/", handler)
+
+	var listener net.Listener
+	if cfg.SocketPath != "" {
+		slog.Info("starting a web server", "address", cfg.SocketPath)
+		listener, err = net.Listen("unix", cfg.SocketPath)
+	} else {
+		slog.Info("starting a web server", "address", cfg.ListeningAddress)
+		listener, err = net.Listen("tcp", cfg.ListeningAddress)
+	}
+
+	if err != nil {
+		slog.Error("unable to start a web server", "err", err)
+		os.Exit(-1)
+	}
+
+	connsClosed := make(chan struct{})
+
+	var srv http.Server
+	go handleInterrupt(&srv, connsClosed)
+
+	if err = srv.Serve(listener); err != http.ErrServerClosed {
+		slog.Error("http server returned an error", "err", err)
+		os.Exit(-1)
+	}
+
+	<-connsClosed
 }
