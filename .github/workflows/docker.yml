@@ -1,4 +1,4 @@
-name: Docker
+name: Build
 
 on:
   push:
@@ -13,8 +13,24 @@ env:
 
 
 jobs:
-  build:
+  build-binary:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4.2.2
+      - name: Setup golang
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.23"
+      - name: Build
+        run: go build -v -o phoenix .
+      - name: Upload compiled program
+        uses: actions/upload-artifact@v4
+        with:
+          name: phoenix-linux-x86-64
+          path: phoenix
 
+  build-docker:
     runs-on: ubuntu-latest
     permissions:
       contents: read
