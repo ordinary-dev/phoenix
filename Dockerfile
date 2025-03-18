@@ -1,4 +1,4 @@
-FROM golang:1.22-alpine AS builder
+FROM golang:1.23-alpine AS builder
 
 RUN apk add --no-cache gcc libc-dev
 
@@ -11,7 +11,7 @@ ADD . .
 
 RUN go build -o main
 
-FROM alpine:3.19
+FROM alpine:3.21
 
 WORKDIR /app
 COPY --from=builder /app/main /usr/local/bin/phoenix

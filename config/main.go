@@ -63,6 +63,13 @@ type Config struct {
 	Title string
 	// Any supported css value, embedded directly into every page.
 	FontFamily string
+
+	// Unix socket path.
+	// Example: "/run/phoenix/server.sock".
+	SocketPath string
+	// Listening address, ignored if SocketPath is set.
+	// Examples: ":8080", "127.0.0.1:80".
+	ListeningAddress string
 }
 
 func GetConfig() (*Config, error) {
@@ -83,6 +90,12 @@ func GetConfig() (*Config, error) {
 	Cfg.SecureCookie = getBoolFromEnv(true, "SECURE_COOKIE", "P_SECURECOOKIE")
 	Cfg.Title = getStrFromEnv("Phoenix", "TITLE", "P_TITLE")
 	Cfg.FontFamily = getStrFromEnv("sans-serif", "FONT_FAMILY", "P_FONTFAMILY")
+
+	Cfg.SocketPath = getStrFromEnv("", "SOCKET_PATH")
+	Cfg.ListeningAddress = getStrFromEnv("", "LISTENING_ADDRESS")
+	if Cfg.ListeningAddress == "" {
+		Cfg.ListeningAddress = ":8080"
+	}
 
 	return &Cfg, nil
 }

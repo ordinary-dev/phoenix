@@ -8,7 +8,7 @@ import (
 )
 
 // Create and configure an HTTP server.
-func GetHttpServer() (*http.Server, error) {
+func GetHandler() (http.Handler, error) {
 	if err := controllers.LoadTemplates(); err != nil {
 		return nil, err
 	}
@@ -47,10 +47,7 @@ func GetHttpServer() (*http.Server, error) {
 	protectedMux.HandleFunc("GET /import", controllers.ImportPage)
 	protectedMux.HandleFunc("POST /import", controllers.Import)
 
-	return &http.Server{
-		Addr: ":8080",
-		Handler: middleware.LoggingMiddleware(
-			middleware.SecurityHeadersMiddleware(mux),
-		),
-	}, nil
+	return middleware.LoggingMiddleware(
+		middleware.SecurityHeadersMiddleware(mux),
+	), nil
 }
