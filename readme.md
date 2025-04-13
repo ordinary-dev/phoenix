@@ -10,6 +10,19 @@ List view:
 Tile view:
 ![Screenshot (tile view)](screenshot-tiles.webp)
 
+## Quick start
+
+```sh
+docker run -it -p 8080:8080 ghcr.io/ordinary-dev/phoenix:v2.1.0
+```
+
+If you don't want to lose data on restart, use the following command:
+
+```sh
+docker volume create phoenix
+docker run -it -p 8080:8080 -v phoenix:/var/lib/phoenix ghcr.io/ordinary-dev/phoenix:v2.1.0
+```
+
 ## Features
 - No javascript
 - Authorization support
