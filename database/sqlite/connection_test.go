@@ -1,4 +1,4 @@
-package database
+package sqlite
 
 import (
 	"database/sql"
@@ -10,16 +10,19 @@ import (
 
 const TEST_DB_PATH = "/tmp/phoenix.sqlite3"
 
-func initTestDatabase(t *testing.T) {
+func initTestDatabase(t *testing.T) SqliteDB {
 	var err error
-	DB, err = sql.Open("sqlite3", TEST_DB_PATH)
+	var db SqliteDB
+	db.conn, err = sql.Open("sqlite3", TEST_DB_PATH)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if err := ApplyMigrations(); err != nil {
+	if err := db.Migrate(); err != nil {
 		t.Fatal(err)
 	}
+
+	return db
 }
 
 func deleteTestDatabase(t *testing.T) {

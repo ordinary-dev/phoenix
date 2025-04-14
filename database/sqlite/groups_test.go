@@ -1,44 +1,45 @@
-package database
+package sqlite
 
 import (
 	"testing"
 
 	_ "github.com/mattn/go-sqlite3"
+	"github.com/ordinary-dev/phoenix/database/entities"
 )
 
 func TestGroups(t *testing.T) {
-	initTestDatabase(t)
+	db := initTestDatabase(t)
 	defer deleteTestDatabase(t)
 
-	user, err := CreateUser("group-test", nil)
+	user, err := db.CreateUser("group-test", nil)
 	if err != nil {
 		t.Fatalf("error creating user: %v", err)
 	}
 
 	// Create the first group.
-	group := Group{
+	group := entities.Group{
 		Name:     "test",
 		Username: &user.Username,
 	}
-	if err := CreateGroup(&group); err != nil {
+	if err := db.CreateGroup(&group); err != nil {
 		t.Fatal(err)
 	}
 	if group.ID == 0 {
 		t.Fatal("group id is zero")
 	}
 
-	_, err = GetGroup(group.ID)
+	_, err = db.GetGroup(group.ID)
 	if err != nil {
 		t.Errorf("can't get the group: %v", err)
 	}
 
 	// Update group.
-	if err := UpdateGroup(group.ID, "new-name"); err != nil {
+	if err := db.UpdateGroup(group.ID, "new-name"); err != nil {
 		t.Fatal(err)
 	}
 
 	// Read groups.
-	groupList, err := GetGroupsWithLinks(&user.Username)
+	groupList, err := db.GetGroupsWithLinks(&user.Username)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -52,13 +53,13 @@ func TestGroups(t *testing.T) {
 	}
 
 	// Transfer ownership.
-	err = TransferGroups(&user.Username, nil)
+	err = db.TransferGroups(&user.Username, nil)
 	if err != nil {
 		t.Errorf("error when changing owner: %v", err)
 	}
 
 	// Delete group.
-	if err := DeleteGroup(group.ID); err != nil {
+	if err := db.DeleteGroup(group.ID); err != nil {
 		t.Fatal(err)
 	}
 }

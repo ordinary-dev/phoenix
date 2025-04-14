@@ -2,14 +2,16 @@ package main
 
 import (
 	"context"
-	"github.com/ordinary-dev/phoenix/config"
-	"github.com/ordinary-dev/phoenix/database"
-	"github.com/ordinary-dev/phoenix/web"
 	"log/slog"
 	"net"
 	"net/http"
 	"os"
 	"os/signal"
+
+	"github.com/ordinary-dev/phoenix/config"
+	"github.com/ordinary-dev/phoenix/database"
+	"github.com/ordinary-dev/phoenix/database/sqlite"
+	"github.com/ordinary-dev/phoenix/web"
 )
 
 func handleInterrupt(srv *http.Server, connsClosed chan struct{}) {
@@ -37,27 +39,28 @@ func main() {
 	})
 	slog.SetDefault(slog.New(logger))
 
-	err = database.EstablishDatabaseConnection(cfg)
+	var db database.Database = &sqlite.SqliteDB{}
+	err = db.Connect(cfg)
 	if err != nil {
 		slog.Error("can't connect to the database", "err", err)
 		os.Exit(-1)
 	}
 
-	if err := database.ApplyMigrations(); err != nil {
+	if err := db.Migrate(); err != nil {
 		slog.Error("can't apply database migrations", "err", err)
 		os.Exit(-1)
 	}
 
 	// Create the first user.
 	if cfg.DefaultUsername != "" && cfg.DefaultPassword != "" {
-		userCount, err := database.CountUsers()
+		userCount, err := db.CountUsers()
 		if err != nil {
 			slog.Error("can't query user count", "err", err)
 			os.Exit(-1)
 		}
 
 		if userCount < 1 {
-			_, err := database.CreateUser(cfg.DefaultUsername, &cfg.DefaultPassword)
+			_, err := db.CreateUser(cfg.DefaultUsername, &cfg.DefaultPassword)
 			if err != nil {
 				slog.Error("can't create the first user", "err", err)
 				os.Exit(-1)
@@ -65,13 +68,13 @@ func main() {
 		}
 	}
 
-	handler, err := web.GetHandler()
+	httpHandler, err := web.GetHttpHandler(db)
 	if err != nil {
 		slog.Error("unable to create a web server", "err", err)
 		os.Exit(-1)
 	}
 
-	http.Handle("/", handler)
+	http.Handle("/", httpHandler)
 
 	var listener net.Listener
 	if cfg.SocketPath != "" {

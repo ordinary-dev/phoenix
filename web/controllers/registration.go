@@ -6,17 +6,16 @@ import (
 	"strings"
 
 	"github.com/ordinary-dev/phoenix/config"
-	"github.com/ordinary-dev/phoenix/database"
 	"github.com/ordinary-dev/phoenix/web/sessions"
 )
 
-func ShowRegistrationForm(w http.ResponseWriter, _ *http.Request) {
+func (c *Controllers) ShowRegistrationForm(w http.ResponseWriter, _ *http.Request) {
 	if !config.Cfg.EnableRegistration {
-		ShowError(w, http.StatusForbidden, errors.New("registration disabled"))
+		c.ShowError(w, http.StatusForbidden, errors.New("registration disabled"))
 		return
 	}
 
-	Render("auth.html.tmpl", w, map[string]any{
+	c.render("auth.html.tmpl", w, map[string]any{
 		"title":       "Create an account",
 		"description": "To prevent other people from seeing your links, create an account.",
 		"button":      "Create",
@@ -24,24 +23,24 @@ func ShowRegistrationForm(w http.ResponseWriter, _ *http.Request) {
 	})
 }
 
-func CreateUser(w http.ResponseWriter, r *http.Request) {
+func (c *Controllers) CreateUser(w http.ResponseWriter, r *http.Request) {
 	if !config.Cfg.EnableRegistration {
-		ShowError(w, http.StatusForbidden, errors.New("registration disabled"))
+		c.ShowError(w, http.StatusForbidden, errors.New("registration disabled"))
 		return
 	}
 
 	username := strings.TrimSpace(r.FormValue("username"))
 	password := strings.TrimSpace(r.FormValue("password"))
-	user, err := database.CreateUser(username, &password)
+	user, err := c.db.CreateUser(username, &password)
 	if err != nil {
-		ShowError(w, http.StatusInternalServerError, err)
+		c.ShowError(w, http.StatusInternalServerError, err)
 		return
 	}
 
 	// Generate access token.
-	session, err := database.CreateSession(user.Username)
+	session, err := c.db.CreateSession(user.Username)
 	if err != nil {
-		ShowError(w, http.StatusInternalServerError, err)
+		c.ShowError(w, http.StatusInternalServerError, err)
 		return
 	}
 	http.SetCookie(w, sessions.SessionToCookie(session))

@@ -12,7 +12,7 @@ func TestLoadTemplates(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if err := LoadTemplates(); err != nil {
+	if _, err := loadTemplates(); err != nil {
 		t.Fatal(err)
 	}
 }

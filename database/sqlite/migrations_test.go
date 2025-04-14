@@ -1,4 +1,4 @@
-package database
+package sqlite
 
 import (
 	"testing"
@@ -7,11 +7,11 @@ import (
 )
 
 func TestMigrations(t *testing.T) {
-	initTestDatabase(t)
+	db := initTestDatabase(t)
 	defer deleteTestDatabase(t)
 
 	// We should be able to call the function multiple times.
-	if err := ApplyMigrations(); err != nil {
+	if err := db.Migrate(); err != nil {
 		t.Fatal(err)
 	}
 }

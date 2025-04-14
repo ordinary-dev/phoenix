@@ -1,4 +1,4 @@
-package database
+package sqlite
 
 import (
 	"testing"
@@ -7,11 +7,11 @@ import (
 )
 
 func TestUsers(t *testing.T) {
-	initTestDatabase(t)
+	db := initTestDatabase(t)
 	defer deleteTestDatabase(t)
 
 	// We should have no users.
-	count, err := CountUsers()
+	count, err := db.CountUsers()
 	if err != nil {
 		t.Errorf("error counting users: %v", err)
 	}
@@ -23,13 +23,13 @@ func TestUsers(t *testing.T) {
 	// Create the first user.
 	username := "test"
 	password := "test"
-	user, err := CreateUser(username, &password)
+	user, err := db.CreateUser(username, &password)
 	if err != nil {
 		t.Errorf("error creating user: %v", err)
 	}
 
 	// Check password and get the user.
-	dbUser, err := GetUserIfPasswordMatches(username, password)
+	dbUser, err := db.GetUserIfPasswordMatches(username, password)
 	if err != nil {
 		t.Errorf("error checking password: %v", err)
 	}
@@ -38,12 +38,12 @@ func TestUsers(t *testing.T) {
 	}
 
 	// Check wrong password handling.
-	if _, err := GetUserIfPasswordMatches("test", "wrong-password"); err == nil {
+	if _, err := db.GetUserIfPasswordMatches("test", "wrong-password"); err == nil {
 		t.Error("wrong password was accepted")
 	}
 
 	// Count users again.
-	count, err = CountUsers()
+	count, err = db.CountUsers()
 	if err != nil {
 		t.Errorf("error recounting users: %v", err)
 	}
@@ -53,13 +53,13 @@ func TestUsers(t *testing.T) {
 	}
 
 	// Create session.
-	session, err := CreateSession(user.Username)
+	session, err := db.CreateSession(user.Username)
 	if err != nil {
 		t.Errorf("error creating session: %v", err)
 	}
 
 	// Use session token.
-	authorizedUser, _, err := GetUserByToken(session.Token)
+	authorizedUser, _, err := db.GetUserByToken(session.Token)
 	if err != nil {
 		t.Errorf("can't use session token: %v", err)
 	}
@@ -68,19 +68,19 @@ func TestUsers(t *testing.T) {
 		t.Errorf("session belongs to a different user: %s != %s", authorizedUser.Username, user.Username)
 	}
 
-	_, _, err = GetUserByToken("wrong-token")
+	_, _, err = db.GetUserByToken("wrong-token")
 	if err == nil {
 		t.Errorf("wrong token authorized someone")
 	}
 
 	// Delete session.
-	err = DeleteSession(session.Token)
+	err = db.DeleteSession(session.Token)
 	if err != nil {
 		t.Errorf("can't delete session: %v", err)
 	}
 
 	// Delete user.
-	if err := DeleteUser(user.Username); err != nil {
+	if err := db.DeleteUser(user.Username); err != nil {
 		t.Errorf("error deleting user: %v", err)
 	}
 }

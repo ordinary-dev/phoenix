@@ -1,32 +1,33 @@
-package database
+package sqlite
 
 import (
 	"testing"
 
 	_ "github.com/mattn/go-sqlite3"
+	"github.com/ordinary-dev/phoenix/database/entities"
 )
 
 func TestLinks(t *testing.T) {
-	initTestDatabase(t)
+	db := initTestDatabase(t)
 	defer deleteTestDatabase(t)
 
 	// Create the first group.
-	group := Group{
+	group := entities.Group{
 		Name: "test",
 	}
-	if err := CreateGroup(&group); err != nil {
+	if err := db.CreateGroup(&group); err != nil {
 		t.Fatal(err)
 	}
 
 	// Create the first link.
 	icon := "test/icon"
-	link := Link{
+	link := entities.Link{
 		Name:    "test",
 		Href:    "/test",
 		GroupID: group.ID,
 		Icon:    &icon,
 	}
-	if err := CreateLink(&link); err != nil {
+	if err := db.CreateLink(&link); err != nil {
 		t.Fatal(err)
 	}
 	if link.ID == 0 {
@@ -35,17 +36,17 @@ func TestLinks(t *testing.T) {
 
 	// Update link.
 	link.Href = "/new-href"
-	if err := UpdateLink(&link); err != nil {
+	if err := db.UpdateLink(&link); err != nil {
 		t.Fatal(err)
 	}
 
 	// Delete link.
-	if err := DeleteLink(link.ID); err != nil {
+	if err := db.DeleteLink(link.ID); err != nil {
 		t.Fatal(err)
 	}
 
 	// Delete group.
-	if err := DeleteGroup(group.ID); err != nil {
+	if err := db.DeleteGroup(group.ID); err != nil {
 		t.Fatal(err)
 	}
 }

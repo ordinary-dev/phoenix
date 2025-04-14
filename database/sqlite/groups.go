@@ -1,13 +1,10 @@
-package database
+package sqlite
 
-type Group struct {
-	ID       int     `json:"id"`
-	Name     string  `json:"name"`
-	Username *string `json:"-"`
-	Links    []Link  `json:"links"`
-}
+import (
+	"github.com/ordinary-dev/phoenix/database/entities"
+)
 
-func GetGroupsWithLinks(username *string) ([]Group, error) {
+func (db *SqliteDB) GetGroupsWithLinks(username *string) ([]entities.Group, error) {
 	query := `
         SELECT id, name
         FROM groups
@@ -15,15 +12,15 @@ func GetGroupsWithLinks(username *string) ([]Group, error) {
         ORDER BY groups.id
     `
 
-	rows, err := DB.Query(query, username)
+	rows, err := db.conn.Query(query, username)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
-	var groups []Group
+	var groups []entities.Group
 	for rows.Next() {
-		group := Group{
+		group := entities.Group{
 			Username: username,
 		}
 		if err := rows.Scan(&group.ID, &group.Name); err != nil {
@@ -37,7 +34,7 @@ func GetGroupsWithLinks(username *string) ([]Group, error) {
 	}
 
 	for i := range groups {
-		groups[i].Links, err = GetLinksFromGroup(groups[i].ID)
+		groups[i].Links, err = db.GetLinksFromGroup(groups[i].ID)
 		if err != nil {
 			return nil, err
 		}
@@ -48,14 +45,14 @@ func GetGroupsWithLinks(username *string) ([]Group, error) {
 
 // Create a new group in the database.
 // The function fills in the ID.
-func CreateGroup(group *Group) error {
+func (db *SqliteDB) CreateGroup(group *entities.Group) error {
 	query := `
         INSERT INTO groups (name, username)
         VALUES (?, ?)
         RETURNING id
     `
 
-	if err := DB.QueryRow(query, group.Name, group.Username).Scan(&group.ID); err != nil {
+	if err := db.conn.QueryRow(query, group.Name, group.Username).Scan(&group.ID); err != nil {
 		return err
 	}
 
@@ -63,39 +60,39 @@ func CreateGroup(group *Group) error {
 }
 
 // Get group by id without child links.
-func GetGroup(id int) (Group, error) {
+func (db *SqliteDB) GetGroup(id int) (entities.Group, error) {
 	query := `
         SELECT name, username
         FROM groups
         WHERE id = ?
     `
 
-	group := Group{
+	group := entities.Group{
 		ID: id,
 	}
-	err := DB.QueryRow(query, id).Scan(&group.Name, &group.Username)
+	err := db.conn.QueryRow(query, id).Scan(&group.Name, &group.Username)
 	return group, err
 }
 
 // Transfer groups from one owner to another.
-func TransferGroups(from, to *string) error {
+func (db *SqliteDB) TransferGroups(from, to *string) error {
 	query := `
         UPDATE groups
         SET username = ?
         WHERE username = ?
     `
-	_, err := DB.Exec(query, to, from)
+	_, err := db.conn.Exec(query, to, from)
 	return err
 }
 
-func UpdateGroup(id int, name string) error {
+func (db *SqliteDB) UpdateGroup(id int, name string) error {
 	query := `
         UPDATE groups
         SET name = ?
         WHERE id = ?
     `
 
-	res, err := DB.Exec(query, name, id)
+	res, err := db.conn.Exec(query, name, id)
 	if err != nil {
 		return err
 	}
@@ -112,13 +109,13 @@ func UpdateGroup(id int, name string) error {
 	return nil
 }
 
-func DeleteGroup(groupID int) error {
+func (db *SqliteDB) DeleteGroup(groupID int) error {
 	query := `
         DELETE FROM groups
         WHERE id = ?
     `
 
-	res, err := DB.Exec(query, groupID)
+	res, err := db.conn.Exec(query, groupID)
 	if err != nil {
 		return err
 	}

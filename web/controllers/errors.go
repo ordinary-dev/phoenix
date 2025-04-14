@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-func ShowError(w http.ResponseWriter, statusCode int, err error) {
+func (c *Controllers) ShowError(w http.ResponseWriter, statusCode int, err error) {
 	if statusCode < 500 {
 		slog.Warn("request failed", "err", err, "code", statusCode)
 	} else {
@@ -13,7 +13,7 @@ func ShowError(w http.ResponseWriter, statusCode int, err error) {
 	}
 
 	w.WriteHeader(statusCode)
-	Render("error.html.tmpl", w, map[string]any{
+	c.render("error.html.tmpl", w, map[string]any{
 		"title":       "Error",
 		"description": "The request failed.",
 		"error":       err.Error(),

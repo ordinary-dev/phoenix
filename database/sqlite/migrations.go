@@ -1,4 +1,4 @@
-package database
+package sqlite
 
 import (
 	"database/sql"
@@ -67,9 +67,9 @@ var migrations = []string{
     SET username = (SELECT username FROM users LIMIT 1)`,
 }
 
-func ApplyMigrations() error {
+func (db *SqliteDB) Migrate() error {
 	// Create a table to record applied migrations and retrieve the saved data.
-	_, err := DB.Exec(`CREATE TABLE IF NOT EXISTS migrations (
+	_, err := db.conn.Exec(`CREATE TABLE IF NOT EXISTS migrations (
         version INTEGER NOT NULL DEFAULT 0
     )`)
 	if err != nil {
@@ -77,7 +77,7 @@ func ApplyMigrations() error {
 	}
 
 	var currentVersion int
-	err = DB.
+	err = db.conn.
 		QueryRow("SELECT version FROM migrations").
 		Scan(&currentVersion)
 	if err != nil {
@@ -86,7 +86,7 @@ func ApplyMigrations() error {
 		}
 
 		// The table is empty, create a record.
-		_, err = DB.Exec("INSERT INTO migrations (version) VALUES (0)")
+		_, err = db.conn.Exec("INSERT INTO migrations (version) VALUES (0)")
 		if err != nil {
 			return err
 		}
@@ -99,7 +99,7 @@ func ApplyMigrations() error {
 			continue
 		}
 
-		if err := applyMigration(migrationID, migration); err != nil {
+		if err := db.applyMigration(migrationID, migration); err != nil {
 			return fmt.Errorf("migration #%d: %w", migrationID, err)
 		}
 
@@ -109,8 +109,8 @@ func ApplyMigrations() error {
 	return nil
 }
 
-func applyMigration(migrationID int, query string) error {
-	tx, err := DB.Begin()
+func (db *SqliteDB) applyMigration(migrationID int, query string) error {
+	tx, err := db.conn.Begin()
 	if err != nil {
 		return err
 	}

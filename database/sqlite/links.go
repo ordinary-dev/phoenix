@@ -1,14 +1,10 @@
-package database
+package sqlite
 
-type Link struct {
-	ID      int     `json:"id"`
-	Name    string  `json:"name"`
-	Href    string  `json:"href"`
-	GroupID int     `json:"-"`
-	Icon    *string `json:"icon,omitempty"`
-}
+import (
+	"github.com/ordinary-dev/phoenix/database/entities"
+)
 
-func GetLinksFromGroup(groupID int) ([]Link, error) {
+func (db *SqliteDB) GetLinksFromGroup(groupID int) ([]entities.Link, error) {
 	query := `
         SELECT id, name, href, group_id, icon
         FROM links
@@ -16,15 +12,15 @@ func GetLinksFromGroup(groupID int) ([]Link, error) {
         ORDER BY id
     `
 
-	rows, err := DB.Query(query, groupID)
+	rows, err := db.conn.Query(query, groupID)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
-	var links []Link
+	var links []entities.Link
 	for rows.Next() {
-		var link Link
+		var link entities.Link
 		if err := rows.Scan(&link.ID, &link.Name, &link.Href, &link.GroupID, &link.Icon); err != nil {
 			return nil, err
 		}
@@ -38,15 +34,15 @@ func GetLinksFromGroup(groupID int) ([]Link, error) {
 	return links, nil
 }
 
-func GetLink(id int) (*Link, error) {
+func (db *SqliteDB) GetLink(id int) (*entities.Link, error) {
 	query := `
         SELECT id, name, href, group_id, icon
         FROM links
         WHERE id = ?
     `
 
-	var link Link
-	err := DB.
+	var link entities.Link
+	err := db.conn.
 		QueryRow(query, id).
 		Scan(&link.ID, &link.Name, &link.Href, &link.GroupID, &link.Icon)
 	if err != nil {
@@ -58,14 +54,14 @@ func GetLink(id int) (*Link, error) {
 
 // Create a new link in the database.
 // The function fills in the ID.
-func CreateLink(link *Link) error {
+func (db *SqliteDB) CreateLink(link *entities.Link) error {
 	query := `
         INSERT INTO links (name, href, group_id, icon)
         VALUES (?, ?, ?, ?)
         RETURNING id
     `
 
-	err := DB.
+	err := db.conn.
 		QueryRow(query, link.Name, link.Href, link.GroupID, link.Icon).
 		Scan(&link.ID)
 
@@ -76,14 +72,14 @@ func CreateLink(link *Link) error {
 	return nil
 }
 
-func UpdateLink(link *Link) error {
+func (db *SqliteDB) UpdateLink(link *entities.Link) error {
 	query := `
         UPDATE links
         SET name = ?, href = ?, group_id = ?, icon = ?
         WHERE id = ?
     `
 
-	res, err := DB.Exec(query, link.Name, link.Href, link.GroupID, link.Icon, link.ID)
+	res, err := db.conn.Exec(query, link.Name, link.Href, link.GroupID, link.Icon, link.ID)
 	if err != nil {
 		return err
 	}
@@ -100,13 +96,13 @@ func UpdateLink(link *Link) error {
 	return nil
 }
 
-func DeleteLink(linkID int) error {
+func (db *SqliteDB) DeleteLink(linkID int) error {
 	query := `
         DELETE FROM links
         WHERE id = ?
     `
 
-	res, err := DB.Exec(query, linkID)
+	res, err := db.conn.Exec(query, linkID)
 	if err != nil {
 		return err
 	}

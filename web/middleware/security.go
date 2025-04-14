@@ -6,7 +6,7 @@ import (
 
 // Adds several headers to the response to improve security.
 // For example, headers prevent embedding a site and passing information about the referrer.
-func SecurityHeadersMiddleware(next http.Handler) http.Handler {
+func (m *Middleware) SecurityHeadersMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("X-Frame-Options", "SAMEORIGIN")
 		w.Header().Set("X-Content-Type-Options", "nosniff")

@@ -4,15 +4,14 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/ordinary-dev/phoenix/database"
 	"github.com/ordinary-dev/phoenix/web/sessions"
 )
 
-func ShowMainPage(w http.ResponseWriter, r *http.Request) {
+func (c *Controllers) ShowMainPage(w http.ResponseWriter, r *http.Request) {
 	username := sessions.GetUsername(r.Context())
-	groups, err := database.GetGroupsWithLinks(&username)
+	groups, err := c.db.GetGroupsWithLinks(&username)
 	if err != nil {
-		ShowError(w, http.StatusInternalServerError, err)
+		c.ShowError(w, http.StatusInternalServerError, err)
 		return
 	}
 
@@ -39,7 +38,7 @@ func ShowMainPage(w http.ResponseWriter, r *http.Request) {
 		style = "list"
 	}
 
-	Render("index.html.tmpl", w, map[string]any{
+	c.render("index.html.tmpl", w, map[string]any{
 		"description": "Self-hosted start page.",
 		"groups":      groups,
 		"style":       style,
